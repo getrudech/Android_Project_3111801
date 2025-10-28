@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">DermaDiary Application</string>
+    <string name="app_name">DermaDiary</string>
+    <string name="home_title">DermaDiary: Home</string>
+    <string name="btn_journal_text">Start Daily Journal</string>
+    <string name="btn_camera_text">Take New Photo</string>
+    <string name="btn_insights_text">View Progress and Insights</string>
 </resources>

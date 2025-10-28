@@ -7,13 +7,28 @@
     android:padding="24dp">
 
     <TextView
-
-        android:textSize="22sp"
+        android:id="@+id/tv_title"
+        android:text="@string/home_title"  android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="48dp"
         android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/btn_open_journal"
+        android:text="@string/btn_journal_text" android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/btn_open_camera"
+        android:text="@string/btn_camera_text" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btn_view_insights"
+        android:text="@string/btn_insights_text" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
 </LinearLayout>
