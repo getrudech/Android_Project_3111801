@@ -7,7 +7,7 @@
     android:padding="24dp">
 
     <TextView
-        android:text="Welcome to DermaDiary"
+
         android:textSize="22sp"
         android:textStyle="bold"
         android:layout_marginBottom="24dp"
@@ -15,23 +15,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/btnJournal"
-        android:text="Open Journal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/btnCamera"
-        android:text="Open Camera"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
-
-    <Button
-        android:id="@+id/btnInsights"
-        android:text="View Insights"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
 </LinearLayout>
