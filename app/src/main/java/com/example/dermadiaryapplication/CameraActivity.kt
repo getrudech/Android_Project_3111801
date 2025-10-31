@@ -14,24 +14,24 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.ui.platform.LocalContext
 
-// Sensor Imports
+// Sensor Imports for Milestone 2
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.platform.LocalContext
 
-// Variable to hold the light reading
+
+// GLOBAL STATE and SENSOR LOGIC
 private var lightValue = mutableStateOf(0.0f)
 private lateinit var sensorManager: SensorManager
 private var lightSensor: Sensor? = null
 
-// Listener that receives sensor updates
 private val lightListener: SensorEventListener = object : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
@@ -39,43 +39,35 @@ private val lightListener: SensorEventListener = object : SensorEventListener {
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Required by the interface
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 }
 
 class CameraActivity : ComponentActivity() {
 
-    // 1. LIFECYCLE: onCreate (Setup services and initial UI)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Get the SensorManager service
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        // Get the default Light Sensor
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
 
         setContent {
-            // Use the scaffold for the back button and title
             AppScaffold(title = "Take Photo", showBackArrow = true) { paddingModifier ->
                 CameraScreenUI(paddingModifier)
             }
         }
     }
 
-    // 2. LIFECYCLE: onResume (Register listener to start receiving data and save battery)
     override fun onResume() {
         super.onResume()
         lightSensor?.let {
             sensorManager.registerListener(
                 lightListener,
                 it,
-                SensorManager.SENSOR_DELAY_UI // Recommended delay for UI updates
+                SensorManager.SENSOR_DELAY_UI
             )
         }
     }
 
-    // 3. LIFECYCLE: onPause (Unregister listener to stop receiving data and save battery)
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(lightListener)
@@ -83,7 +75,7 @@ class CameraActivity : ComponentActivity() {
 
     @Composable
     fun CameraScreenUI(modifier: Modifier) {
-        // IMPLICIT INTENT SETUP (Example 33)
+        // IMPLICIT INTENT SETUP
         var imageUri by remember { mutableStateOf<Uri?>(null) }
 
         val launcher = rememberLauncherForActivityResult(
@@ -99,28 +91,30 @@ class CameraActivity : ComponentActivity() {
             currentLux > 5000f -> "Too Bright"
             else -> "Good"
         }
+        val softBackgroundColor = Color(0xFFF0F2F5)
+
 
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .background(softBackgroundColor)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // 1. Tips Card
+            // 1. Tips Card (Integrating Sensor feedback)
             Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Text("💡 Tips for best results", style = MaterialTheme.typography.titleMedium)
+                    Text("Tips for best results", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
                     Text("• Use natural lighting if possible")
                     Text("• Take photos at the same time each day")
                     Text("• Keep the same angle and distance")
-                    Text("• Current Light: ${"%.1f".format(currentLux)} Lux (${lightingFeedback})",
-                        color = if (lightingFeedback == "Good") Color(0xFF1E88E5) else Color.Red) // Dynamic color feedback
+                    Text("• Current Light: ${"%.1f".format(currentLux)} Lux (${lightingFeedback})")
                 }
             }
 
-            // 2. Dashed Border Placeholder
+            // 2. Photo Placeholder Frame
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -135,28 +129,27 @@ class CameraActivity : ComponentActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Large Icon/Button to trigger photo
+                    // Button to trigger photo
                     Button(
                         onClick = { launcher.launch("image/*") },
                         modifier = Modifier.size(80.dp),
-                        shape = androidx.compose.foundation.shape.CircleShape
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
                     ) {
                         // Placeholder for a Camera Icon
-                        Text("📸", fontSize = 32.sp)
+                        Text("Cam", fontSize = 16.sp, color = Color.White)
                     }
                     Spacer(Modifier.height(16.dp))
                     Text("Tap to take photo", style = MaterialTheme.typography.titleMedium)
                     Text("or upload from gallery", style = MaterialTheme.typography.bodySmall)
 
-                    // Show selected status
                     if (imageUri != null) {
-                        Text("✅ Image Ready", color = Color(0xFF4CAF50), modifier = Modifier.padding(top = 8.dp))
+                        Text("Image Ready", color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp))
                     }
                 }
             }
 
-            // Final Notes
-            Text("Your photos are stored securely and privately", modifier = Modifier.padding(top = 8.dp))
+            Text("Your photos are stored securely and privately", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
 
         }
     }

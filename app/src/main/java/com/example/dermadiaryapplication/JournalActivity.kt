@@ -3,17 +3,18 @@ package com.example.dermadiaryapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 
 // ------------------- ACTIVITY CLASS -------------------
 
@@ -21,7 +22,6 @@ class JournalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // Calling the scaffold, which contains the TopAppBar and the UI
             AppScaffold(title = "Daily Reflection", showBackArrow = true) { paddingModifier ->
                 JournalScreenUI(paddingModifier)
             }
@@ -29,7 +29,7 @@ class JournalActivity : ComponentActivity() {
     }
 }
 
-// ------------------- REUSABLE SCAFFOLD (For Back Navigation) -------------------
+// ------------------- REUSABLE SCAFFOLD (For Back Navigation and Transparent Header) -------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,14 +39,20 @@ fun AppScaffold(
     content: @Composable (Modifier) -> Unit
 ) {
     val context = LocalContext.current
+    val softBackgroundColor = Color(0xFFF0F2F5)
 
     Scaffold(
+        containerColor = softBackgroundColor,
         topBar = {
             TopAppBar(
                 title = { Text(text = title) },
+                // FIX: Set TopAppBar to transparent container color
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
+                ),
                 navigationIcon = {
                     if (showBackArrow) {
-                        // The back button action: finish the current Activity
                         IconButton(onClick = {
                             (context as ComponentActivity).finish()
                         }) {
@@ -68,7 +74,6 @@ fun AppScaffold(
 @Composable
 fun JournalScreenUI(modifier: Modifier) {
     // State management for inputs
-    var skinNotes by remember { mutableStateOf("") }
     var selectedMoodIndex by remember { mutableStateOf(0) }
     val moodOptions = listOf("Happy", "Neutral", "Stressed")
     var stressLevel by remember { mutableStateOf(5f) }
@@ -79,14 +84,14 @@ fun JournalScreenUI(modifier: Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp), // Horizontal padding for card containment
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(16.dp) // Spacing between cards
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        // Title (Daily Reflection - How are you doing today?)
-        Text(text = "How are you doing today?", fontSize = 18.sp, modifier = Modifier.padding(top = 8.dp))
-
+        Text(text = "How are you doing today?",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(top = 8.dp))
 
         // Card 1: Mood/Emotion
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -98,7 +103,7 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
-        // Card 2: Stress Level
+        // Card 2: Stress Level (Slider)
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(text = "Stress Level (0-10)", fontSize = 16.sp)
@@ -111,11 +116,10 @@ fun JournalScreenUI(modifier: Modifier) {
                     value = stressLevel,
                     onValueChange = { stressLevel = it },
                     valueRange = 0f..10f,
-                    steps = 9 // 11 possible values (0 to 10)
+                    steps = 9
                 )
             }
         }
-
 
         // Card 3: Diet Notes (TextField)
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -124,21 +128,7 @@ fun JournalScreenUI(modifier: Modifier) {
                 TextField(
                     value = dietNotes,
                     onValueChange = { dietNotes = it },
-                    placeholder = { Text("Breakfast, lunch, dinner, snacks... Any trigger foods?") },
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 3 // Allows multiple lines for notes
-                )
-            }
-        }
-
-        // Card 4: Skincare Products Used (TextField)
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Skincare Products Used", fontSize = 16.sp)
-                TextField(
-                    value = productsUsed,
-                    onValueChange = { productsUsed = it },
-                    placeholder = { Text("Cleanser, moisturizer, serum, etc.") },
+                    placeholder = { Text("Breakfast, lunch, dinner, snacks...") },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3
                 )
@@ -147,7 +137,7 @@ fun JournalScreenUI(modifier: Modifier) {
 
         // Save Button
         Button(
-            onClick = { /* Save Logic  */ },
+            onClick = { /* Save Logic Here */ },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
@@ -155,14 +145,12 @@ fun JournalScreenUI(modifier: Modifier) {
             Text(text = "Save Daily Log", fontSize = 18.sp)
         }
 
-
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
 // ------------------- REUSABLE COMPONENTS -------------------
 
-// Reusable Composable for Radio Button Groups
 @Composable
 fun RadioButtonGroup(
     radioOptions: List<String>,
