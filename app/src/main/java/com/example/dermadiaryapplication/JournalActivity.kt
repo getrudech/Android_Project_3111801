@@ -5,8 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -29,11 +32,15 @@ class JournalActivity : ComponentActivity() {
     }
 }
 
-// main Journal Screen UI
+//main Journal Screen UI
 @Composable
 fun JournalScreenUI() {
     // State management for the Notes input
     var skinNotes by remember { mutableStateOf("") }
+
+    // State management for the Mood tracker
+    var selectedMoodIndex by remember { mutableStateOf(0) }
+    val moodOptions = listOf("Great", "Okay", "Tired", "Stressed")
 
     Column(
         modifier = Modifier
@@ -46,15 +53,54 @@ fun JournalScreenUI() {
         Text(text = "Daily Skin Journal", fontSize = 24.sp)
         Text(text = "Log your daily factors and observations.", fontSize = 16.sp)
 
-        // Text Input Field for Notes
+        // Text Input Field
         TextField(
             value = skinNotes,
-            onValueChange = { skinNotes = it },
+            onValueChange = { skinNotes = it }, // Update state on user input
             label = { Text("Daily Notes (Acne, Dryness, etc.)") },
-            modifier = Modifier.fillMaxSize(0.9f) //90% of the screen width
+            modifier = Modifier.fillMaxWidth() // Uses full width
         )
 
-        // We will add more input fields here in the next step.
+        // Mood Tracker Section
+        Text(text = "How do you feel today?", fontSize = 16.sp, modifier = Modifier.padding(top = 8.dp))
 
+        // Radio Button Group
+        RadioButtonGroup(
+            radioOptions = moodOptions,
+            selected = selectedMoodIndex,
+            onStateChanged = { newIndex ->
+                selectedMoodIndex = newIndex // Update the state when a new button is clicked
+            }
+        )
+    }
+}
+
+// Reusable Composable for Radio Button Groups
+@Composable
+fun RadioButtonGroup(
+    radioOptions: List<String>,
+    selected: Int,
+    onStateChanged: (Int) -> Unit
+) {
+    // The list of radio buttons will be laid out in a Column
+    Column {
+        radioOptions.forEachIndexed { index, option ->
+            // Each button and its text label is placed in a Row
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = selected == index,
+                    onClick = { onStateChanged(index) }
+                )
+                Text(
+                    text = option,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
     }
 }
