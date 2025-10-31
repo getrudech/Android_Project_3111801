@@ -45,5 +45,25 @@ fun HomeScreenUI(activity: ComponentActivity) {
         }) {
             Text(text = "Start Daily Journal")
         }
+
+        //Camera Button
+        Button(
+            onClick = {
+                // Launching the CameraActivity using an Explicit Intent
+                val cameraIntent = Intent(activity, CameraActivity::class.java)
+                activity.startActivity(cameraIntent)
+            },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(text = "Take New Photo")
+        }
+
+        // Insights Button
+        Button(
+            onClick = { },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(text = "View Progress & Insights")
+        }
     }
 }
