@@ -4,4 +4,5 @@
     <string name="btn_journal_text">Start Daily Journal</string>
     <string name="btn_camera_text">Take New Photo</string>
     <string name="btn_insights_text">View Progress and Insights</string>
+    <string name="title_activity_journal">JournalActivity</string>
 </resources>
