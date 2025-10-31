@@ -3,77 +3,164 @@ package com.example.dermadiaryapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+
+// ------------------- ACTIVITY CLASS -------------------
 
 class JournalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            JournalScreenUI()
+            // Calling the scaffold, which contains the TopAppBar and the UI
+            AppScaffold(title = "Daily Reflection", showBackArrow = true) { paddingModifier ->
+                JournalScreenUI(paddingModifier)
+            }
         }
     }
 }
 
-//main Journal Screen UI
-@Composable
-fun JournalScreenUI() {
-    // State management for the Notes input
-    var skinNotes by remember { mutableStateOf("") }
+// ------------------- REUSABLE SCAFFOLD (For Back Navigation) -------------------
 
-    // State management for the Mood tracker
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppScaffold(
+    title: String,
+    showBackArrow: Boolean = false,
+    content: @Composable (Modifier) -> Unit
+) {
+    val context = LocalContext.current
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = title) },
+                navigationIcon = {
+                    if (showBackArrow) {
+                        // The back button action: finish the current Activity
+                        IconButton(onClick = {
+                            (context as ComponentActivity).finish()
+                        }) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
+                        }
+                    }
+                }
+            )
+        },
+        content = { paddingValues ->
+            content(Modifier.padding(paddingValues))
+        }
+    )
+}
+
+
+// ------------------- UI Implementation -------------------
+
+@Composable
+fun JournalScreenUI(modifier: Modifier) {
+    // State management for inputs
+    var skinNotes by remember { mutableStateOf("") }
     var selectedMoodIndex by remember { mutableStateOf(0) }
-    val moodOptions = listOf("Great", "Okay", "Tired", "Stressed")
+    val moodOptions = listOf("Happy", "Neutral", "Stressed")
+    var stressLevel by remember { mutableStateOf(5f) }
+    var dietNotes by remember { mutableStateOf("") }
+    var productsUsed by remember { mutableStateOf("") }
+
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp), // Horizontal padding for card containment
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp) // Spacing between cards
     ) {
-        // Title
-        Text(text = "Daily Skin Journal", fontSize = 24.sp)
-        Text(text = "Log your daily factors and observations.", fontSize = 16.sp)
 
-        // Text Input Field
-        TextField(
-            value = skinNotes,
-            onValueChange = { skinNotes = it }, // Update state on user input
-            label = { Text("Daily Notes (Acne, Dryness, etc.)") },
-            modifier = Modifier.fillMaxWidth() // Uses full width
-        )
+        // Title (Daily Reflection - How are you doing today?)
+        Text(text = "How are you doing today?", fontSize = 18.sp, modifier = Modifier.padding(top = 8.dp))
 
-        // Mood Tracker Section
-        Text(text = "How do you feel today?", fontSize = 16.sp, modifier = Modifier.padding(top = 8.dp))
 
-        // Radio Button Group
-        RadioButtonGroup(
-            radioOptions = moodOptions,
-            selected = selectedMoodIndex,
-            onStateChanged = { newIndex ->
-                selectedMoodIndex = newIndex // Update the state when a new button is clicked
+        // Card 1: Mood/Emotion
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "How are you feeling?", fontSize = 16.sp)
+                RadioButtonGroup(moodOptions, selectedMoodIndex) { newIndex ->
+                    selectedMoodIndex = newIndex
+                }
             }
-        )
+        }
+
+        // Card 2: Stress Level
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(text = "Stress Level (0-10)", fontSize = 16.sp)
+
+                Text(text = "${stressLevel.toInt()}",
+                    fontSize = 24.sp,
+                    modifier = Modifier.align(Alignment.CenterHorizontally))
+
+                Slider(
+                    value = stressLevel,
+                    onValueChange = { stressLevel = it },
+                    valueRange = 0f..10f,
+                    steps = 9 // 11 possible values (0 to 10)
+                )
+            }
+        }
+
+
+        // Card 3: Diet Notes (TextField)
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "What did you eat today?", fontSize = 16.sp)
+                TextField(
+                    value = dietNotes,
+                    onValueChange = { dietNotes = it },
+                    placeholder = { Text("Breakfast, lunch, dinner, snacks... Any trigger foods?") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 3 // Allows multiple lines for notes
+                )
+            }
+        }
+
+        // Card 4: Skincare Products Used (TextField)
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Skincare Products Used", fontSize = 16.sp)
+                TextField(
+                    value = productsUsed,
+                    onValueChange = { productsUsed = it },
+                    placeholder = { Text("Cleanser, moisturizer, serum, etc.") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 3
+                )
+            }
+        }
+
+        // Save Button
+        Button(
+            onClick = { /* Save Logic  */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
+            Text(text = "Save Daily Log", fontSize = 18.sp)
+        }
+
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
+
+// ------------------- REUSABLE COMPONENTS -------------------
 
 // Reusable Composable for Radio Button Groups
 @Composable
@@ -82,24 +169,17 @@ fun RadioButtonGroup(
     selected: Int,
     onStateChanged: (Int) -> Unit
 ) {
-    // The list of radio buttons will be laid out in a Column
-    Column {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
         radioOptions.forEachIndexed { index, option ->
-            // Each button and its text label is placed in a Row
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 RadioButton(
                     selected = selected == index,
                     onClick = { onStateChanged(index) }
                 )
-                Text(
-                    text = option,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                Text(text = option, fontSize = 12.sp)
             }
         }
     }
