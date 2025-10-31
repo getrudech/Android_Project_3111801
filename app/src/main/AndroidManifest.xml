@@ -12,6 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DermaDiaryApplication">
         <activity
+            android:name=".InsightsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_insights"
+            android:theme="@style/Theme.DermaDiaryApplication" />
+        <activity
+            android:name=".CameraActivity"
+            android:exported="false"
+            android:label="@string/title_activity_camera"
+            android:theme="@style/Theme.DermaDiaryApplication" />
+        <activity
             android:name=".JournalActivity"
             android:exported="false"
             android:label="@string/title_activity_journal"

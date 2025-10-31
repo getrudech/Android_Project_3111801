@@ -5,4 +5,6 @@
     <string name="btn_camera_text">Take New Photo</string>
     <string name="btn_insights_text">View Progress and Insights</string>
     <string name="title_activity_journal">JournalActivity</string>
+    <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_insights">InsightsActivity</string>
 </resources>
