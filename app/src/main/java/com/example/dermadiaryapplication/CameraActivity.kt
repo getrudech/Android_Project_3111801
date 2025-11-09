@@ -132,7 +132,7 @@ class CameraActivity : ComponentActivity() {
                     // Button to trigger photo
                     Button(
                         onClick = { launcher.launch("image/*") },
-                        modifier = Modifier.size(80.dp),
+                        modifier = Modifier.size(100.dp),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
                     ) {
