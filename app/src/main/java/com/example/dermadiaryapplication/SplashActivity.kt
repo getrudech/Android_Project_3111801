@@ -53,27 +53,27 @@ class SplashActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background), // Use Theme Color
+                .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "DermaDiary",
                 fontSize = 50.sp,
-                color = MaterialTheme.colorScheme.primary, // Use Theme Color
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
             Text(
                 text = "Loading Your Skin Health Journal...",
-                style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant), // Use Theme Color
+                style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant),
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
             // Progress Bar (Dynamic Element)
             CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary, // Use Theme Color
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(40.dp)
             )
         }

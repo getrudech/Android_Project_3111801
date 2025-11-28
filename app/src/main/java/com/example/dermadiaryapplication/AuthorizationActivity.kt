@@ -1,7 +1,9 @@
 package com.example.dermadiaryapplication
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -11,7 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -33,7 +35,7 @@ class AuthorizationActivity : ComponentActivity() {
     fun AuthScreenUI() {
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
-
+        val context = LocalContext.current // Used for showing the Toast message
 
         Column(
             modifier = Modifier
@@ -43,7 +45,7 @@ class AuthorizationActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo / Title
+
             Text(
                 text = "DermaDiary",
                 fontSize = 32.sp,
@@ -60,7 +62,7 @@ class AuthorizationActivity : ComponentActivity() {
             // Input Fields Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Use Theme Color
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     OutlinedTextField(
@@ -70,7 +72,7 @@ class AuthorizationActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         singleLine = true,
-                        colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                        colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
@@ -78,45 +80,52 @@ class AuthorizationActivity : ComponentActivity() {
                         onValueChange = { password = it },
                         label = { Text("Password") },
                         modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = PasswordVisualTransformation(), // Hides the password input
+                        visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
-                        colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                        colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Login Button (Navigates to Home - Simulating a successful login)
+            // Login Button (Simulating Authentication Check)
             Button(
                 onClick = {
-                    // In a real app, we would verify credentials here.
-                    // For now, we assume login is successful and go to Home.
-                    val intent = Intent(this@AuthorizationActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish() // Close Auth screen after login
+                    if (email.isBlank() || password.isBlank()) {
+                        Toast.makeText(context, "Please enter email and password.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Successful check, navigate to Home
+                        Toast.makeText(context, "Authentication successful! Navigating to dashboard.", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@AuthorizationActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = MaterialTheme.shapes.medium,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary) // Use Theme Color
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Log In", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary) // Use Theme Color
+                Text("Log In", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Register Button (Navigates to Onboarding - Simulating a new user)
+            // Register Button ( Registration details captured, proceed to Onboarding)
             TextButton(
                 onClick = {
-                    // Navigating to the Onboarding Questionnaire
-                    val intent = Intent(this@AuthorizationActivity, OnboardingActivity::class.java)
-                    startActivity(intent)
+                    if (email.isBlank() || password.isBlank()) {
+                        Toast.makeText(context, "Enter details to create account.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Details captured, proceed to personalization (Onboarding)
+                        val intent = Intent(this@AuthorizationActivity, OnboardingActivity::class.java)
+                        startActivity(intent)
+                        finish() // Close Auth screen after starting registration flow
+                    }
                 }
             ) {
-                Text("New here? Create an Account", color = MaterialTheme.colorScheme.primary) // Use Theme Color
+                Text("New here? Create an Account", color = MaterialTheme.colorScheme.primary)
             }
         }
     }

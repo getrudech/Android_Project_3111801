@@ -17,15 +17,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.*
-import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
+import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme // Corrected Theme Import
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.automirrored.filled.Assignment
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            DermaDiaryTheme {
+            DermaDiaryTheme { // Corrected Theme Usage
                 AppScaffold(title = "") { paddingModifier ->
                     HomeScreenUI(this, paddingModifier)
                 }
@@ -36,36 +38,41 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(scrollState) // Make screen scrollable
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Custom Header
+        // Custom Header (Unified with Background)
         Text(text = "DermaDiary",
             fontSize = 36.sp,
             style = MaterialTheme.typography.displaySmall.copy(
                 fontWeight = FontWeight.ExtraBold
             ),
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(top = 16.dp))
         Text(text = "Your Skin Health Journal",
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 32.dp))
 
-        // Motivational Tip Card
+        // Motivational Tip Card (Mock Image Placeholder)
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            modifier = Modifier.fillMaxWidth().height(100.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
-            Text(
-                text = "Your skin regenerates most during sleep",
-                modifier = Modifier.padding(12.dp),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Box(modifier = Modifier.fillMaxSize().padding(12.dp), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "Tip of the Day: Consistent sleep boosts cell regeneration!",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -83,14 +90,14 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
 
         Text(text = "Quick Actions",
             fontSize = 20.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
             style = MaterialTheme.typography.titleLarge
         )
 
-        // Quick Action Buttons
+        // Quick Action Buttons (Navigation)
         QuickActionButton(
             text = "Take Photo",
             subtext = "Capture today's progress",
@@ -99,7 +106,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
                 activity.startActivity(intent)
             },
             icon = Icons.Filled.CameraAlt,
-            accentColor = MaterialTheme.colorScheme.primary // Pink
+            accentColor = MaterialTheme.colorScheme.primary
         )
         QuickActionButton(
             text = "Log Daily Info",
@@ -109,7 +116,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
                 activity.startActivity(intent)
             },
             icon = Icons.AutoMirrored.Filled.Assignment,
-            accentColor = MaterialTheme.colorScheme.secondary // Blue
+            accentColor = MaterialTheme.colorScheme.secondary
         )
         QuickActionButton(
             text = "View Insights",
@@ -119,7 +126,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
                 activity.startActivity(intent)
             },
             icon = Icons.Filled.Timeline,
-            accentColor = MaterialTheme.colorScheme.tertiary // Green
+            accentColor = MaterialTheme.colorScheme.tertiary
         )
         Spacer(modifier = Modifier.height(16.dp))
     }

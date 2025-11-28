@@ -97,71 +97,71 @@ fun JournalScreenUI(modifier: Modifier) {
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = "How are you doing today?", fontSize = 18.sp, modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.onBackground) // Use Theme Color
+        Text(text = "How are you doing today?", fontSize = 18.sp, modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.onBackground)
 
         // Card 1: Mood
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { // Use Theme Color
+        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "How are you feeling?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                Text(text = "How are you feeling?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 RadioButtonGroup(moodOptions, selectedMoodIndex) { selectedMoodIndex = it }
             }
         }
 
         // Card 2: Stress
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { // Use Theme Color
+        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Stress Level (0-10)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
-                Text(text = "${stressLevel.toInt()}", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
-                Slider(value = stressLevel, onValueChange = { stressLevel = it }, valueRange = 0f..10f, steps = 9, colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary)) // Use Theme Color
+                Text(text = "Stress Level (0-10)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
+                Text(text = "${stressLevel.toInt()}", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.onSurface)
+                Slider(value = stressLevel, onValueChange = { stressLevel = it }, valueRange = 0f..10f, steps = 9, colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary))
             }
         }
 
         // Card 3: Sleep
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { // Use Theme Color
+        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Sleep Hours (Last Night)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                Text(text = "Sleep Hours (Last Night)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 TextField(
                     value = sleepHours,
                     onValueChange = { sleepHours = it },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                    colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
 
         // Card 4: Water
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { // Use Theme Color
+        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Water Glasses (Daily)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                Text(text = "Water Glasses (Daily)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 TextField(
                     value = waterGlasses,
                     onValueChange = { waterGlasses = it },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                    colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
 
         // Card 5: Diet
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { // Use Theme Color
+        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "What did you eat today?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                Text(text = "What did you eat today?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 TextField(
                     value = dietNotes,
                     onValueChange = { dietNotes = it },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3,
-                    colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                    colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
 
         // Card 6: Products (Checkbox)
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { // Use Theme Color
+        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Skincare Products Used Today", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                Text(text = "Skincare Products Used Today", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 SkincareCheckboxGroup(
                     products = skincareProducts,
                     checkedStates = productsUsedState,
@@ -175,9 +175,9 @@ fun JournalScreenUI(modifier: Modifier) {
         Button(
             onClick = { /* Save Logic Here */ },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary) // Use Theme Color
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Text(text = "Save Daily Log", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary) // Use Theme Color
+            Text(text = "Save Daily Log", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary)
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -191,7 +191,7 @@ fun RadioButtonGroup(radioOptions: List<String>, selected: Int, onStateChanged: 
                 RadioButton(
                     selected = selected == index,
                     onClick = { onStateChanged(index) },
-                    colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary, unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
+                    colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary, unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
                 Text(text = option, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
             }
@@ -204,11 +204,11 @@ fun SkincareCheckboxGroup(products: List<String>, checkedStates: List<Boolean>, 
     Column {
         products.forEachIndexed { index, product ->
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = product, fontSize = 16.sp, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                Text(text = product, fontSize = 16.sp, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
                 Checkbox(
                     checked = checkedStates[index],
                     onCheckedChange = { isChecked -> onStateChanged(index, isChecked) },
-                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary, uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
+                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary, uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
             }
         }

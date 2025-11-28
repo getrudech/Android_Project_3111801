@@ -22,9 +22,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import androidx.compose.ui.text.font.FontWeight
 import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
-
-// NOTE: AppScaffold is defined in JournalActivity.kt
 
 // GLOBAL STATE and SENSOR LOGIC
 private var lightValue = mutableStateOf(0.0f)
@@ -87,17 +86,22 @@ class CameraActivity : ComponentActivity() {
         // SENSOR DISPLAY LOGIC
         val currentLux = lightValue.value
         val lightingFeedback = when {
-            currentLux < 50f -> "Too Dark"
-            currentLux > 5000f -> "Too Bright"
+            currentLux < 50f -> "Too Dark (Warning)"
+            currentLux > 5000f -> "Too Bright (Warning)"
             else -> "Good"
         }
-        // val softBackgroundColor = Color(0xFFF0F2F5) // Replaced with Theme
+
+        // Conditional text color based on lighting
+        val sensorColor = when (lightingFeedback) {
+            "Good" -> MaterialTheme.colorScheme.tertiary // Green
+            else -> MaterialTheme.colorScheme.error // Red/Error
+        }
 
 
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background) // Use Theme Color
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -105,15 +109,21 @@ class CameraActivity : ComponentActivity() {
             // 1. Tips Card (Integrating Sensor feedback)
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Use Theme Color
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Text("Tips for best results", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
+                    Text("Tips for best results", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(Modifier.height(8.dp))
-                    Text("• Use natural lighting if possible", color = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
-                    Text("• Take photos at the same time each day", color = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
-                    Text("• Keep the same angle and distance", color = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
-                    Text("• Current Light: ${"%.1f".format(currentLux)} Lux (${lightingFeedback})", color = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
+                    Text("• Use natural lighting if possible", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("• Take photos at the same time each day", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("• Keep the same angle and distance", color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                    // HIGHLIGHTED SENSOR OUTPUT
+                    Text(
+                        text = "• Light Level: ${"%.1f".format(currentLux)} Lux - ${lightingFeedback}",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        color = sensorColor // COLOR CHANGES BASED ON LIGHTING
+                    )
                 }
             }
 
@@ -123,13 +133,11 @@ class CameraActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .height(300.dp)
                     .padding(vertical = 16.dp),
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline), // Use Theme Color
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Use Theme Color
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
+                    modifier = Modifier.fillMaxSize().padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -138,24 +146,24 @@ class CameraActivity : ComponentActivity() {
                         onClick = { launcher.launch("image/*") },
                         modifier = Modifier.size(80.dp),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)) // Use Theme Color
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
                     ) {
                         // Placeholder for a Camera Icon
-                        Text("Cam", fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary) // Use Theme Color
+                        Text("Cam", fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary)
                     }
                     Spacer(Modifier.height(16.dp))
-                    Text("Tap to take photo", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface) // Use Theme Color
-                    Text("or upload from gallery", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
+                    Text("Tap to take photo", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                    Text("or upload from gallery", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                     // Show selected status
                     if (imageUri != null) {
-                        Text("Image Ready", color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp)) // Use Theme Color
+                        Text("Image Ready", color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp))
                     }
                 }
             }
 
             // Final Notes
-            Text("Your photos are stored securely and privately", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant) // Use Theme Color
+            Text("Your photos are stored securely and privately", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         }
     }
