@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,8 +16,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 
 // ------------------- ACTIVITY CLASS -------------------
+
+private val KeyboardType.Companion.NumberDecimal: Any
 
 class JournalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,7 +83,8 @@ fun JournalScreenUI(modifier: Modifier) {
     var stressLevel by remember { mutableStateOf(5f) }
     var dietNotes by remember { mutableStateOf("") }
     var productsUsed by remember { mutableStateOf("") }
-
+    var sleepHours by remember { mutableStateOf("8") }
+    var waterGlasses by remember { mutableStateOf("8") }
 
     Column(
         modifier = modifier
@@ -120,6 +125,37 @@ fun JournalScreenUI(modifier: Modifier) {
                 )
             }
         }
+        // Card 3: Sleep Hours Input
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Sleep Hours (Last Night)", fontSize = 16.sp)
+                TextField(
+                    value = sleepHours,
+                    onValueChange = { sleepHours = it },
+                    placeholder = { Text("e.g., 7.5") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberDecimal
+                    )
+                )
+            }
+        }
+
+        // Card 4: Water Intake
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Water Glasses (Daily)", fontSize = 16.sp)
+                TextField(
+                    value = waterGlasses,
+                    onValueChange = { waterGlasses = it },
+                    placeholder = { Text("e.g., 8") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                    )
+                )
+            }
+        }
 
         // Card 3: Diet Notes (TextField)
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -149,7 +185,7 @@ fun JournalScreenUI(modifier: Modifier) {
     }
 }
 
-// ------------------- REUSABLE COMPONENTS -------------------
+// ------------------- REUSABLE COMPONENTS
 
 @Composable
 fun RadioButtonGroup(

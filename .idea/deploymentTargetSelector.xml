@@ -4,11 +4,14 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-10-28T15:37:52.210688Z">
+        <DropdownSelection timestamp="2025-11-09T21:45:21.078537700Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Getrude\.android\avd\Pixel_8.avd" />
+              <DeviceId pluginId="FirebaseDirectAccess" identifier="reservation=projects/dermafinal/deviceSessions/session-273x0pdi98dhm" />
             </handle>
+            <template>
+              <DeviceId pluginId="FirebaseDirectAccess" type="TEMPLATE" identifier="model_id=xiaomi_lab_garnet/34" />
+            </template>
           </Target>
         </DropdownSelection>
         <DialogSelection />
