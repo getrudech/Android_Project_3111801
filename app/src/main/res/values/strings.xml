@@ -7,4 +7,7 @@
     <string name="title_activity_journal">JournalActivity</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_insights">InsightsActivity</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_authorization">AuthorizationActivity</string>
+    <string name="title_activity_onboarding">OnboardingActivity</string>
 </resources>
