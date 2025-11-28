@@ -32,7 +32,6 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    // --- Data Model for Questionnaire ---
     data class OnboardingData(
         val skinConcerns: SnapshotStateList<Boolean>,
         val productRoutine: SnapshotStateList<ProductInput>,
@@ -42,12 +41,12 @@ class OnboardingActivity : ComponentActivity() {
         var preexistingConditions: String = ""
     )
 
-    // Note: This must be a mutable class to allow state changes to be observed by the SnapshotStateList
-    data class ProductInput(
-        val name: String,
-        var isUsed: Boolean = false,
-        var brand: String = ""
-    )
+    class ProductInput(
+        val name: String
+    ) {
+        var isUsed by mutableStateOf(false)
+        var brand by mutableStateOf("")
+    }
 
     @Composable
     fun OnboardingScreenUI() {
@@ -55,10 +54,9 @@ class OnboardingActivity : ComponentActivity() {
         var currentStep by remember { mutableStateOf(0) }
         val productTypes = listOf("Cleanser", "Moisturizer", "Serum", "SPF")
 
-        // Primary state store for all answers
         val onboardingData = remember {
             OnboardingData(
-                skinConcerns = mutableStateListOf(false, false, false, false, false), // Acne, Dry, Oily, Sensitive, Other
+                skinConcerns = mutableStateListOf(false, false, false, false, false),
                 productRoutine = mutableStateListOf<ProductInput>().apply {
                     productTypes.forEach { name -> add(ProductInput(name)) }
                 }
@@ -71,19 +69,17 @@ class OnboardingActivity : ComponentActivity() {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp)
         ) {
-            // Progress Bar
             LinearProgressIndicator(
-            progress = { (currentStep + 1) / totalSteps.toFloat() },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
-            color = MaterialTheme.colorScheme.primary,
-            trackColor = ProgressIndicatorDefaults.linearTrackColor,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                progress = { (currentStep + 1) / totalSteps.toFloat() },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
 
-            // Dynamic Content based on Step
             Box(modifier = Modifier.weight(1f)) {
                 val scrollState = rememberScrollState()
-                Column(modifier = Modifier.verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(24.dp)) { // Added spacing
+                Column(modifier = Modifier.verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(24.dp)) {
                     when (currentStep) {
                         0 -> SkinConcernsStep(onboardingData.skinConcerns)
                         1 -> RoutineStep(onboardingData.productRoutine)
@@ -92,12 +88,10 @@ class OnboardingActivity : ComponentActivity() {
                 }
             }
 
-            // Navigation Buttons
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Back Button (Hide on first step)
                 if (currentStep > 0) {
                     OutlinedButton(onClick = { currentStep-- }) {
                         Text("Back", color = MaterialTheme.colorScheme.primary)
@@ -106,13 +100,11 @@ class OnboardingActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                 }
 
-                // Next / Finish Button
                 Button(
                     onClick = {
                         if (currentStep < totalSteps - 1) {
                             currentStep++
                         } else {
-                            // FINISH: Go to Home Dashboard
                             val intent = Intent(this@OnboardingActivity, MainActivity::class.java)
                             startActivity(intent)
                             finish()
@@ -126,7 +118,6 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    // --- STEP 1: SKIN CONCERNS ---
     @Composable
     fun SkinConcernsStep(checkedStates: SnapshotStateList<Boolean>) {
         val concerns = listOf("Acne/Breakouts", "Chronic Dryness", "Excess Oiliness", "Redness/Sensitivity", "Hyperpigmentation")
@@ -154,7 +145,6 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    // --- STEP 2: ROUTINE ---
     @Composable
     fun RoutineStep(products: SnapshotStateList<ProductInput>) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -167,16 +157,13 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    // Specialized Composable for Conditional Product Input
     @Composable
     fun RoutineProductInput(product: ProductInput) {
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-            // Checkbox: Do you use it?
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = product.isUsed,
                     onCheckedChange = { isChecked ->
-                        // This makes the UI recompose and the checkbox state updates instantly.
                         product.isUsed = isChecked
                         if (!isChecked) product.brand = ""
                     },
@@ -185,7 +172,6 @@ class OnboardingActivity : ComponentActivity() {
                 Text("Do you use a ${product.name}?", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             }
 
-            // Conditional Text Field: Which brand?
             if (product.isUsed) {
                 OutlinedTextField(
                     value = product.brand,
@@ -198,13 +184,11 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    // --- STEP 3: LIFESTYLE ---
     @Composable
     fun LifestyleStep(data: OnboardingData) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text("3/3: Your Lifestyle and Health History", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
 
-            // Gender Input (Radio Buttons)
             Text("What is your biological sex?", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 val genders = listOf("Female", "Male", "Prefer Not to Say")
@@ -212,7 +196,7 @@ class OnboardingActivity : ComponentActivity() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = data.gender == gender,
-                            onClick = { data.gender = gender }, // Direct mutation works here
+                            onClick = { data.gender = gender },
                             colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary, unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                         Text(gender, modifier = Modifier.padding(start = 4.dp), color = MaterialTheme.colorScheme.onBackground)
@@ -220,7 +204,6 @@ class OnboardingActivity : ComponentActivity() {
                 }
             }
 
-            // Sleep Goal Input
             OutlinedTextField(
                 value = data.sleepGoal,
                 onValueChange = { data.sleepGoal = it },
@@ -231,7 +214,6 @@ class OnboardingActivity : ComponentActivity() {
 
             )
 
-            // Water Goal Input
             OutlinedTextField(
                 value = data.waterGoal,
                 onValueChange = { data.waterGoal = it },
@@ -241,10 +223,9 @@ class OnboardingActivity : ComponentActivity() {
                 colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
             )
 
-            // Pre-existing Conditions
             OutlinedTextField(
                 value = data.preexistingConditions,
-                onValueChange = { data.preexistingConditions = it }, // Direct mutation works here
+                onValueChange = { data.preexistingConditions = it },
                 label = { Text("Pre-existing conditions (PCOS, Kidney, etc.)") },
                 placeholder = { Text("Enter any relevant health conditions") },
                 modifier = Modifier.fillMaxWidth(),
