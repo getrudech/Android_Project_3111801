@@ -17,10 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-
 // ------------------- ACTIVITY CLASS -------------------
 
-private val KeyboardType.Companion.NumberDecimal: Any
 
 class JournalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +80,15 @@ fun JournalScreenUI(modifier: Modifier) {
     val moodOptions = listOf("Happy", "Neutral", "Stressed")
     var stressLevel by remember { mutableStateOf(5f) }
     var dietNotes by remember { mutableStateOf("") }
-    var productsUsed by remember { mutableStateOf("") }
+    //list of products (will be changed later since i havent created the profile page yet)
+    val skincareProducts = remember {
+        listOf("Facial Cleanser", "Daily Moisturizer", "Vitamin C Serum", "Acne Spot Treatment")
+    }
+
+// Tracks products were used today
+    var productsUsedState by remember {
+        mutableStateOf(List(skincareProducts.size) { false })
+    }
     var sleepHours by remember { mutableStateOf("8") }
     var waterGlasses by remember { mutableStateOf("8") }
 
@@ -134,8 +140,8 @@ fun JournalScreenUI(modifier: Modifier) {
                     onValueChange = { sleepHours = it },
                     placeholder = { Text("e.g., 7.5") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberDecimal
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text
                     )
                 )
             }
@@ -150,8 +156,8 @@ fun JournalScreenUI(modifier: Modifier) {
                     onValueChange = { waterGlasses = it },
                     placeholder = { Text("e.g., 8") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
                     )
                 )
             }
@@ -171,6 +177,29 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
+        // Card 6: Skincare Products Used (Dynamic Checkbox Group)
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Skincare Products Used Today", fontSize = 16.sp)
+
+                SkincareCheckboxGroup(
+                    products = skincareProducts,
+                    checkedStates = productsUsedState,
+                    onStateChanged = { index, isChecked ->
+                        productsUsedState = productsUsedState.toMutableList().apply {
+                            this[index] = isChecked
+                        }
+                    }
+                )
+
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "Tip: Edit product list on your Profile page.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
         // Save Button
         Button(
             onClick = { /* Save Logic Here */ },
@@ -204,6 +233,33 @@ fun RadioButtonGroup(
                     onClick = { onStateChanged(index) }
                 )
                 Text(text = option, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun SkincareCheckboxGroup(
+    products: List<String>,
+    checkedStates: List<Boolean>,
+    onStateChanged: (index: Int, isChecked: Boolean) -> Unit
+) {
+    Column {
+        products.forEachIndexed { index, product ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = product, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                Checkbox(
+                    checked = checkedStates[index],
+                    onCheckedChange = { isChecked ->
+                        onStateChanged(index, isChecked)
+                    }
+                )
             }
         }
     }
