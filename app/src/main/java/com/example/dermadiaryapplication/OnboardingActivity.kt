@@ -32,14 +32,15 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    data class OnboardingData(
+    class OnboardingData(
         val skinConcerns: SnapshotStateList<Boolean>,
-        val productRoutine: SnapshotStateList<ProductInput>,
-        var sleepGoal: String = "8",
-        var waterGoal: String = "8",
-        var gender: String = "Prefer Not to Say",
-        var preexistingConditions: String = ""
-    )
+        val productRoutine: SnapshotStateList<ProductInput>
+    ) {
+        var sleepGoal by mutableStateOf("8")
+        var waterGoal by mutableStateOf("8")
+        var gender by mutableStateOf("Prefer Not to Say")
+        var preexistingConditions by mutableStateOf("")
+    }
 
     class ProductInput(
         val name: String
