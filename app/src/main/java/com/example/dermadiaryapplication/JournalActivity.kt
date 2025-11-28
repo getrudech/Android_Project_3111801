@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,8 +34,6 @@ class JournalActivity : ComponentActivity() {
     }
 }
 
-// ------------------- REUSABLE SCAFFOLD (Transparent Header Fix) -------------------
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(
@@ -49,7 +49,6 @@ fun AppScaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = title, color = MaterialTheme.colorScheme.onBackground) },
-                // FIX: Set TopAppBar to transparent container color
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent,
@@ -82,7 +81,6 @@ fun JournalScreenUI(modifier: Modifier) {
     var sleepHours by remember { mutableStateOf("8") }
     var waterGlasses by remember { mutableStateOf("8") }
 
-    // Dynamic Products list
     val skincareProducts = remember {
         listOf("Facial Cleanser", "Daily Moisturizer", "Vitamin C Serum", "Acne Spot Treatment")
     }
@@ -93,13 +91,13 @@ fun JournalScreenUI(modifier: Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(text = "How are you doing today?", fontSize = 18.sp, modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.onBackground)
 
-        // Card 1: Mood
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "How are you feeling?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -107,7 +105,6 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
-        // Card 2: Stress
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Stress Level (0-10)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -116,7 +113,6 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
-        // Card 3: Sleep
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Sleep Hours (Last Night)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -130,7 +126,6 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
-        // Card 4: Water
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Water Glasses (Daily)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -144,7 +139,6 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
-        // Card 5: Diet
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "What did you eat today?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -158,7 +152,6 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
-        // Card 6: Products (Checkbox)
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Skincare Products Used Today", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -173,7 +166,7 @@ fun JournalScreenUI(modifier: Modifier) {
         }
 
         Button(
-            onClick = { /* Save Logic Here */ },
+            onClick = { },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
