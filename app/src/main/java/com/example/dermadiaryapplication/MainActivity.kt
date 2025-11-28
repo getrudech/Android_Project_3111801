@@ -17,14 +17,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.*
+import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppScaffold(title = "") { paddingModifier ->
-                HomeScreenUI(this, paddingModifier)
+            DermaDiaryTheme {
+                AppScaffold(title = "") { paddingModifier ->
+                    HomeScreenUI(this, paddingModifier)
+                }
             }
         }
     }
@@ -32,15 +36,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
-    val softBackgroundColor = Color(0xFFF0F2F5)
-    val vibrantAccent = Color(0xFFE91E63) // Pink/Magenta
-    val secondaryAccent = Color(0xFF03A9F4) // Blue
-    val tertiaryAccent = Color(0xFF4CAF50) // Green
-
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(softBackgroundColor)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -50,6 +49,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
             style = MaterialTheme.typography.displaySmall.copy(
                 fontWeight = FontWeight.ExtraBold
             ),
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 16.dp))
         Text(text = "Your Skin Health Journal",
             color = MaterialTheme.colorScheme.primary,
@@ -57,10 +57,14 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
             modifier = Modifier.padding(bottom = 32.dp))
 
         // Motivational Tip Card
-        Card(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
             Text(
                 text = "Your skin regenerates most during sleep",
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(12.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -79,6 +83,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
 
         Text(text = "Quick Actions",
             fontSize = 20.sp,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
@@ -94,7 +99,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
                 activity.startActivity(intent)
             },
             icon = Icons.Filled.CameraAlt,
-            accentColor = vibrantAccent
+            accentColor = MaterialTheme.colorScheme.primary // Pink
         )
         QuickActionButton(
             text = "Log Daily Info",
@@ -103,8 +108,8 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
                 val intent = Intent(activity, JournalActivity::class.java)
                 activity.startActivity(intent)
             },
-            icon = Icons.Filled.Assignment,
-            accentColor = secondaryAccent
+            icon = Icons.AutoMirrored.Filled.Assignment,
+            accentColor = MaterialTheme.colorScheme.secondary // Blue
         )
         QuickActionButton(
             text = "View Insights",
@@ -114,7 +119,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
                 activity.startActivity(intent)
             },
             icon = Icons.Filled.Timeline,
-            accentColor = tertiaryAccent
+            accentColor = MaterialTheme.colorScheme.tertiary // Green
         )
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -123,16 +128,16 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
 @Composable
 fun SummaryCard(title: String, value: String, modifier: Modifier) {
     Card(
-        modifier = modifier
-            .height(100.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier = modifier.height(100.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = title, style = MaterialTheme.typography.titleSmall)
-            Text(text = value, style = MaterialTheme.typography.headlineMedium)
+            Text(text = title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = value, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
@@ -145,7 +150,7 @@ fun QuickActionButton(text: String, subtext: String, onClick: () -> Unit, icon: 
             .height(80.dp)
             .padding(vertical = 4.dp),
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier
@@ -154,14 +159,12 @@ fun QuickActionButton(text: String, subtext: String, onClick: () -> Unit, icon: 
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                // Circular icon container
                 modifier = Modifier
                     .size(40.dp)
                     .background(accentColor.copy(alpha = 0.1f), shape = CircleShape)
                     .padding(8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // ACTUAL ICON IMPLEMENTATION
                 Icon(
                     imageVector = icon,
                     contentDescription = text,
@@ -171,8 +174,8 @@ fun QuickActionButton(text: String, subtext: String, onClick: () -> Unit, icon: 
             }
             Spacer(Modifier.width(16.dp))
             Column {
-                Text(text = text, style = MaterialTheme.typography.titleMedium)
-                Text(text = subtext, style = MaterialTheme.typography.bodySmall)
+                Text(text = text, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text(text = subtext, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

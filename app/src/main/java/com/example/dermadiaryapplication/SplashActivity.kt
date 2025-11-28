@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,24 +20,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
 
 class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SplashScreenUI()
+            DermaDiaryTheme {
+                SplashScreenUI()
+            }
         }
     }
 
     @Composable
     fun SplashScreenUI() {
         val coroutineScope = rememberCoroutineScope() // Coroutine scope for running tasks
-        val vibrantAccent = Color(0xFFE91E63)
 
         // LaunchedEffect triggers a coroutine immediately when the composable enters the screen
         LaunchedEffect(key1 = true) {
             coroutineScope.launch {
-                // Delay for 3 seconds before navigating to the next screen
+                // Delay for 3 seconds
                 delay(3000)
 
                 // Navigate to the next screen (AuthActivity)
@@ -46,32 +49,31 @@ class SplashActivity : ComponentActivity() {
             }
         }
 
-        // UI Layout
+        // --- UI Layout ---
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.background), // Use Theme Color
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Animated Element Placeholder
             Text(
                 text = "DermaDiary",
                 fontSize = 50.sp,
-                color = vibrantAccent,
+                color = MaterialTheme.colorScheme.primary, // Use Theme Color
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
             Text(
                 text = "Loading Your Skin Health Journal...",
-                style = androidx.compose.ui.text.TextStyle(color = Color.Gray),
+                style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant), // Use Theme Color
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Progress Bar
+            // Progress Bar (Dynamic Element)
             CircularProgressIndicator(
-                color = vibrantAccent,
+                color = MaterialTheme.colorScheme.primary, // Use Theme Color
                 modifier = Modifier.size(40.dp)
             )
         }
