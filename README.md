@@ -10,7 +10,7 @@ DermaDiary is a native Android application designed to help users understand the
 
 ---
 
-## 📱 Features
+##  Features
 
 * **Unified Authentication:** Seamless toggle between Login and Registration to get started quickly.
 * **Smart Camera:** Uses the device's **Ambient Light Sensor** to provide real-time feedback (Too Dark / Good / Too Bright), ensuring consistent lighting for progress photos.
@@ -18,7 +18,7 @@ DermaDiary is a native Android application designed to help users understand the
 * **Daily Journaling:** distinct inputs for tracking Mood, Stress Levels, Sleep Hours, Water Intake, and Diet.
 * **Insights Dashboard:** (In Development) A dedicated space to view correlations between your habits and skin health.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Language:** Kotlin
 * **UI Framework:** Jetpack Compose (Material Design 3)
@@ -27,7 +27,7 @@ DermaDiary is a native Android application designed to help users understand the
 * **State Management:** MutableState & SnapshotStateList
 
 
-## 🚀 Getting Started
+##  Getting Started
 
 1.  **Clone the repository:**
     ```bash
