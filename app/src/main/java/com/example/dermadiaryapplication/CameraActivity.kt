@@ -25,15 +25,16 @@ import android.hardware.SensorManager
 import androidx.compose.ui.text.font.FontWeight
 import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
 
-// GLOBAL STATE and SENSOR LOGIC
+// Global variables for sensor handling
 private var lightValue = mutableStateOf(0.0f)
 private lateinit var sensorManager: SensorManager
 private var lightSensor: Sensor? = null
 
+// The listener that detects changes in light
 private val lightListener: SensorEventListener = object : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
-            lightValue.value = event.values[0]
+            lightValue.value = event.values[0] // Update our state with new Lux value
         }
     }
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
@@ -44,6 +45,7 @@ class CameraActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize sensor service
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
 
@@ -56,6 +58,7 @@ class CameraActivity : ComponentActivity() {
         }
     }
 
+    // Start listening when the app is active
     override fun onResume() {
         super.onResume()
         lightSensor?.let {
@@ -67,6 +70,7 @@ class CameraActivity : ComponentActivity() {
         }
     }
 
+    // Stop listening to save battery when app is in background
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(lightListener)
@@ -74,7 +78,7 @@ class CameraActivity : ComponentActivity() {
 
     @Composable
     fun CameraScreenUI(modifier: Modifier) {
-        // IMPLICIT INTENT SETUP
+        // Setup the Implicit Intent to launch the phone's camera gallery
         var imageUri by remember { mutableStateOf<Uri?>(null) }
 
         val launcher = rememberLauncherForActivityResult(
@@ -83,7 +87,7 @@ class CameraActivity : ComponentActivity() {
             imageUri = uri
         }
 
-        // SENSOR DISPLAY LOGIC
+        // Logic to determine if lighting is good or bad
         val currentLux = lightValue.value
         val lightingFeedback = when {
             currentLux < 50f -> "Too Dark (Warning)"
@@ -91,7 +95,7 @@ class CameraActivity : ComponentActivity() {
             else -> "Good"
         }
 
-        // Conditional text color based on lighting
+        // Change text color based on the warning
         val sensorColor = when (lightingFeedback) {
             "Good" -> MaterialTheme.colorScheme.tertiary // Green
             else -> MaterialTheme.colorScheme.error // Red/Error
@@ -106,7 +110,7 @@ class CameraActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // 1. Tips Card (Integrating Sensor feedback)
+            // Card showing tips and sensor feedback
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -118,16 +122,16 @@ class CameraActivity : ComponentActivity() {
                     Text("• Take photos at the same time each day", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text("• Keep the same angle and distance", color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-                    // HIGHLIGHTED SENSOR OUTPUT
+                    // Displays the live sensor data
                     Text(
                         text = "• Light Level: ${"%.1f".format(currentLux)} Lux - ${lightingFeedback}",
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        color = sensorColor // COLOR CHANGES BASED ON LIGHTING
+                        color = sensorColor
                     )
                 }
             }
 
-            // 2. Photo Placeholder Frame
+            // Main Camera/Photo area
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -141,28 +145,25 @@ class CameraActivity : ComponentActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Button to trigger photo
+                    // Button to trigger the implicit intent
                     Button(
                         onClick = { launcher.launch("image/*") },
                         modifier = Modifier.size(80.dp),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
                     ) {
-                        // Placeholder for a Camera Icon
                         Text("Cam", fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary)
                     }
                     Spacer(Modifier.height(16.dp))
                     Text("Tap to take photo", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                     Text("or upload from gallery", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-                    // Show selected status
                     if (imageUri != null) {
                         Text("Image Ready", color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp))
                     }
                 }
             }
 
-            // Final Notes
             Text("Your photos are stored securely and privately", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         }

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme // Corrected Theme Import
+import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.Assignment
@@ -27,7 +27,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            DermaDiaryTheme { // Corrected Theme Usage
+            DermaDiaryTheme {
+                // Using a custom Scaffold to handle the layout structure
                 AppScaffold(title = "") { paddingModifier ->
                     HomeScreenUI(this, paddingModifier)
                 }
@@ -44,11 +45,11 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(scrollState) // Make screen scrollable
+            .verticalScroll(scrollState)
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Custom Header (Unified with Background)
+        // App Title and Subtitle
         Text(text = "DermaDiary",
             fontSize = 36.sp,
             style = MaterialTheme.typography.displaySmall.copy(
@@ -61,7 +62,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 32.dp))
 
-        // Motivational Tip Card (Mock Image Placeholder)
+        // Daily Tip Card
         Card(
             modifier = Modifier.fillMaxWidth().height(100.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -77,7 +78,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Summary Stats Row
+        // Stats section placeholders
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
@@ -97,7 +98,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
             style = MaterialTheme.typography.titleLarge
         )
 
-        // Quick Action Buttons (Navigation)
+        // Navigation Buttons using Explicit Intents
         QuickActionButton(
             text = "Take Photo",
             subtext = "Capture today's progress",
@@ -149,6 +150,7 @@ fun SummaryCard(title: String, value: String, modifier: Modifier) {
     }
 }
 
+// Reusable component for the big menu buttons
 @Composable
 fun QuickActionButton(text: String, subtext: String, onClick: () -> Unit, icon: androidx.compose.ui.graphics.vector.ImageVector, accentColor: Color) {
     Card(

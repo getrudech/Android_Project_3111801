@@ -34,6 +34,7 @@ class JournalActivity : ComponentActivity() {
     }
 }
 
+// Custom Scaffold wrapper to keep consistent headers
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(
@@ -58,7 +59,7 @@ fun AppScaffold(
                 navigationIcon = {
                     if (showBackArrow) {
                         IconButton(onClick = {
-                            (context as ComponentActivity).finish()
+                            (context as ComponentActivity).finish() // Close activity on back press
                         }) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
                         }
@@ -74,6 +75,7 @@ fun AppScaffold(
 
 @Composable
 fun JournalScreenUI(modifier: Modifier) {
+    // State variables for form inputs
     var selectedMoodIndex by remember { mutableStateOf(0) }
     val moodOptions = listOf("Happy", "Neutral", "Stressed")
     var stressLevel by remember { mutableStateOf(5f) }
@@ -92,12 +94,13 @@ fun JournalScreenUI(modifier: Modifier) {
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState()), // Allows scrolling so keyboard doesn't hide fields
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(text = "How are you doing today?", fontSize = 18.sp, modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.onBackground)
 
+        // Mood Selection
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "How are you feeling?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -105,6 +108,7 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
+        // Stress Slider
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Stress Level (0-10)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -113,6 +117,7 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
+        // Sleep Input
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Sleep Hours (Last Night)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -126,6 +131,7 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
+        // Water Input
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Water Glasses (Daily)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -139,6 +145,7 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
+        // Diet Notes
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "What did you eat today?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -152,6 +159,7 @@ fun JournalScreenUI(modifier: Modifier) {
             }
         }
 
+        // Product Checklist
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Skincare Products Used Today", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -166,7 +174,7 @@ fun JournalScreenUI(modifier: Modifier) {
         }
 
         Button(
-            onClick = { },
+            onClick = { /* Save Logic will go here in Milestone 3 */ },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
@@ -176,6 +184,7 @@ fun JournalScreenUI(modifier: Modifier) {
     }
 }
 
+// Helper composable for radio buttons
 @Composable
 fun RadioButtonGroup(radioOptions: List<String>, selected: Int, onStateChanged: (Int) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -192,6 +201,7 @@ fun RadioButtonGroup(radioOptions: List<String>, selected: Int, onStateChanged: 
     }
 }
 
+// Helper composable for checkboxes
 @Composable
 fun SkincareCheckboxGroup(products: List<String>, checkedStates: List<Boolean>, onStateChanged: (index: Int, isChecked: Boolean) -> Unit) {
     Column {

@@ -43,17 +43,16 @@ fun InsightsScreenUI(modifier: Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        // Not Enough Data Card (Shows up when no data is present)
+        // Shows a warning card because we don't have a database yet
         NotEnoughDataCard()
 
-        // Mock Insight Card 1: Sleep Correlation
+        // Placeholder cards to show what future insights will look like
         MockInsightCard(
             title = "Sleep vs. Acne Trends",
             description = "Data suggests a clear link between sleep consistency and breakout frequency. More data needed for a definitive conclusion.",
             iconText = "🛌"
         )
 
-        // Mock Insight Card 2: Stress Correlation
         MockInsightCard(
             title = "Stress Level Impact",
             description = "High stress days correlate with increased oiliness and redness in the T-zone.",
@@ -95,7 +94,6 @@ fun MockInsightCard(title: String, description: String, iconText: String) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            // Icon Placeholder
             Text(text = iconText, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(end = 16.dp))
 
             Column {

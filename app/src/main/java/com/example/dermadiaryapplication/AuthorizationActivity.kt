@@ -32,8 +32,11 @@ class AuthorizationActivity : ComponentActivity() {
 
     @Composable
     fun AuthScreenUI() {
+        // State variables for inputs
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
+
+        // Toggles the UI between "Log In" and "Sign Up" mode
         var isLoginMode by remember { mutableStateOf(true) }
         val context = LocalContext.current
 
@@ -52,6 +55,7 @@ class AuthorizationActivity : ComponentActivity() {
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
+            // Change subtitle based on which mode we are in
             Text(
                 text = if (isLoginMode) "Sign in to continue" else "Create a new account",
                 fontSize = 16.sp,
@@ -89,17 +93,20 @@ class AuthorizationActivity : ComponentActivity() {
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Main action button
             Button(
                 onClick = {
                     if (email.isBlank() || password.isBlank()) {
                         Toast.makeText(context, "Please enter email and password.", Toast.LENGTH_SHORT).show()
                     } else {
+                        // Check which flow to run
                         if (isLoginMode) {
                             Toast.makeText(context, "Authentication successful! Navigating to dashboard.", Toast.LENGTH_SHORT).show()
                             val intent = Intent(this@AuthorizationActivity, MainActivity::class.java)
                             startActivity(intent)
                             finish()
                         } else {
+                            // New user goes to Onboarding
                             Toast.makeText(context, "Account created! Let's personalize.", Toast.LENGTH_SHORT).show()
                             val intent = Intent(this@AuthorizationActivity, OnboardingActivity::class.java)
                             startActivity(intent)
@@ -116,6 +123,7 @@ class AuthorizationActivity : ComponentActivity() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Text button to switch modes
             TextButton(
                 onClick = {
                     isLoginMode = !isLoginMode

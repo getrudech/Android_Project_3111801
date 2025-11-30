@@ -32,6 +32,8 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
+    // Stores all the user's answers across the 3 steps
+    // Using mutableStateOf allows the UI to update when typing
     class OnboardingData(
         val skinConcerns: SnapshotStateList<Boolean>,
         val productRoutine: SnapshotStateList<ProductInput>
@@ -42,6 +44,7 @@ class OnboardingActivity : ComponentActivity() {
         var preexistingConditions by mutableStateOf("")
     }
 
+    // Helper class for the checklist items
     class ProductInput(
         val name: String
     ) {
@@ -55,6 +58,7 @@ class OnboardingActivity : ComponentActivity() {
         var currentStep by remember { mutableStateOf(0) }
         val productTypes = listOf("Cleanser", "Moisturizer", "Serum", "SPF")
 
+        // Initialize our data holder
         val onboardingData = remember {
             OnboardingData(
                 skinConcerns = mutableStateListOf(false, false, false, false, false),
@@ -70,6 +74,7 @@ class OnboardingActivity : ComponentActivity() {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp)
         ) {
+            // Visual progress bar at the top
             LinearProgressIndicator(
                 progress = { (currentStep + 1) / totalSteps.toFloat() },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
@@ -78,6 +83,7 @@ class OnboardingActivity : ComponentActivity() {
                 strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
 
+            // Dynamic content area: swaps screens based on step number
             Box(modifier = Modifier.weight(1f)) {
                 val scrollState = rememberScrollState()
                 Column(modifier = Modifier.verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -89,6 +95,7 @@ class OnboardingActivity : ComponentActivity() {
                 }
             }
 
+            // Navigation buttons (Back / Next)
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -104,8 +111,9 @@ class OnboardingActivity : ComponentActivity() {
                 Button(
                     onClick = {
                         if (currentStep < totalSteps - 1) {
-                            currentStep++
+                            currentStep++ // Go to next step
                         } else {
+                            // Finished! Go to main app
                             val intent = Intent(this@OnboardingActivity, MainActivity::class.java)
                             startActivity(intent)
                             finish()
@@ -161,18 +169,20 @@ class OnboardingActivity : ComponentActivity() {
     @Composable
     fun RoutineProductInput(product: ProductInput) {
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            // Checkbox for "Do you use this?"
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = product.isUsed,
                     onCheckedChange = { isChecked ->
                         product.isUsed = isChecked
-                        if (!isChecked) product.brand = ""
+                        if (!isChecked) product.brand = "" // Clear text if unchecked
                     },
                     colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary, uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
                 Text("Do you use a ${product.name}?", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             }
 
+            // Only show the text field if they actually use the product
             if (product.isUsed) {
                 OutlinedTextField(
                     value = product.brand,
@@ -205,6 +215,7 @@ class OnboardingActivity : ComponentActivity() {
                 }
             }
 
+            // Simple text inputs for goals
             OutlinedTextField(
                 value = data.sleepGoal,
                 onValueChange = { data.sleepGoal = it },
