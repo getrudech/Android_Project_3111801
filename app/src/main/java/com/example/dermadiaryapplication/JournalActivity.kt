@@ -19,15 +19,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
+import com.example.dermadiaryapplication.data.db.DermaDiaryDatabase
+import com.example.dermadiaryapplication.data.repository.JournalRepository
+import com.example.dermadiaryapplication.ui.viewmodel.JournalViewModel
+import com.example.dermadiaryapplication.ui.viewmodel.DermaDiaryViewModelFactory
 
 class JournalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             DermaDiaryTheme {
+                // Setting up the database and repository
+                val database = remember { DermaDiaryDatabase.getDatabase(applicationContext) }
+                val repository = remember { JournalRepository(database.journalDao()) }
+                val factory = remember { DermaDiaryViewModelFactory(repository) }
+
                 AppScaffold(title = "Daily Reflection", showBackArrow = true) { paddingModifier ->
-                    JournalScreenUI(paddingModifier)
+                    // Injecting the ViewModel here so the UI can use it
+                    JournalScreenUI(
+                        modifier = paddingModifier,
+                        viewModel = viewModel(factory = factory) // Tell Compose to use my custom factory
+                    )
                 }
             }
         }
@@ -74,21 +88,11 @@ fun AppScaffold(
 }
 
 @Composable
-fun JournalScreenUI(modifier: Modifier) {
-    // State variables for form inputs
-    var selectedMoodIndex by remember { mutableStateOf(0) }
-    val moodOptions = listOf("Happy", "Neutral", "Stressed")
-    var stressLevel by remember { mutableStateOf(5f) }
-    var dietNotes by remember { mutableStateOf("") }
-    var sleepHours by remember { mutableStateOf("8") }
-    var waterGlasses by remember { mutableStateOf("8") }
+fun JournalScreenUI(modifier: Modifier, viewModel: JournalViewModel) {
+    // This watches the ViewModel for any state changes, so the UI updates automatically
+    val uiState by viewModel.uiState.collectAsState()
 
-    val skincareProducts = remember {
-        listOf("Facial Cleanser", "Daily Moisturizer", "Vitamin C Serum", "Acne Spot Treatment")
-    }
-    var productsUsedState by remember {
-        mutableStateOf(List(skincareProducts.size) { false })
-    }
+    val moodOptions = listOf("Happy", "Neutral", "Stressed")
 
     Column(
         modifier = modifier
@@ -104,7 +108,10 @@ fun JournalScreenUI(modifier: Modifier) {
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "How are you feeling?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
-                RadioButtonGroup(moodOptions, selectedMoodIndex) { selectedMoodIndex = it }
+                // Hooking up the RadioButtonGroup to the ViewModel function
+                RadioButtonGroup(moodOptions, uiState.selectedMoodIndex) {
+                    viewModel.updateMood(it)
+                }
             }
         }
 
@@ -112,8 +119,14 @@ fun JournalScreenUI(modifier: Modifier) {
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Stress Level (0-10)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
-                Text(text = "${stressLevel.toInt()}", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.onSurface)
-                Slider(value = stressLevel, onValueChange = { stressLevel = it }, valueRange = 0f..10f, steps = 9, colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary))
+                Text(text = "${uiState.stressLevel.toInt()}", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.onSurface)
+                Slider(
+                    value = uiState.stressLevel,
+                    onValueChange = { viewModel.updateStressLevel(it) },
+                    valueRange = 0f..10f,
+                    steps = 9,
+                    colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary)
+                )
             }
         }
 
@@ -122,8 +135,8 @@ fun JournalScreenUI(modifier: Modifier) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Sleep Hours (Last Night)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 TextField(
-                    value = sleepHours,
-                    onValueChange = { sleepHours = it },
+                    value = uiState.sleepHours,
+                    onValueChange = { viewModel.updateSleepHours(it) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
@@ -136,8 +149,8 @@ fun JournalScreenUI(modifier: Modifier) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Water Glasses (Daily)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 TextField(
-                    value = waterGlasses,
-                    onValueChange = { waterGlasses = it },
+                    value = uiState.waterGlasses,
+                    onValueChange = { viewModel.updateWaterGlasses(it) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
@@ -150,8 +163,8 @@ fun JournalScreenUI(modifier: Modifier) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "What did you eat today?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 TextField(
-                    value = dietNotes,
-                    onValueChange = { dietNotes = it },
+                    value = uiState.dietNotes,
+                    onValueChange = { viewModel.updateDietNotes(it) },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3,
                     colors = TextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedTextColor = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface)
@@ -164,17 +177,18 @@ fun JournalScreenUI(modifier: Modifier) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "Skincare Products Used Today", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 SkincareCheckboxGroup(
-                    products = skincareProducts,
-                    checkedStates = productsUsedState,
+                    products = uiState.skincareProducts,
+                    checkedStates = uiState.productsUsedState,
                     onStateChanged = { index, isChecked ->
-                        productsUsedState = productsUsedState.toMutableList().apply { this[index] = isChecked }
+                        viewModel.updateProductUsed(index, isChecked)
                     }
                 )
             }
         }
 
         Button(
-            onClick = { /* Save Logic will go here in Milestone 3 */ },
+            // Tying the button directly to the ViewModel's save function
+            onClick = { viewModel.saveDailyLog() },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
