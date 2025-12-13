@@ -22,15 +22,31 @@ import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.dermadiaryapplication.data.db.DermaDiaryDatabase
+import com.example.dermadiaryapplication.data.repository.JournalRepository
+import com.example.dermadiaryapplication.ui.viewmodel.DermaDiaryViewModelFactory
+import com.example.dermadiaryapplication.ui.viewmodel.HomeViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             DermaDiaryTheme {
-                // Using a custom Scaffold to handle the layout structure
+                // Setting up the MVVM dependencies for the entire Home screen flow
+                val database = remember { DermaDiaryDatabase.getDatabase(applicationContext) }
+                val repository = remember { JournalRepository(database.journalDao()) }
+                val factory = remember { DermaDiaryViewModelFactory(repository) }
+
                 AppScaffold(title = "") { paddingModifier ->
-                    HomeScreenUI(this, paddingModifier)
+                    HomeScreenUI(
+                        activity = this,
+                        modifier = paddingModifier,
+                        viewModel = viewModel(factory = factory)
+                    )
                 }
             }
         }
@@ -38,8 +54,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
+fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier, viewModel: HomeViewModel) {
     val scrollState = rememberScrollState()
+
+    // Watching the ViewModel's state to get live updates from the database
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = modifier
@@ -49,7 +68,6 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // App Title and Subtitle
         Text(text = "DermaDiary",
             fontSize = 36.sp,
             style = MaterialTheme.typography.displaySmall.copy(
@@ -83,8 +101,10 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            SummaryCard(title = "Total Entries", value = "0", modifier = Modifier.weight(1f).padding(end = 8.dp))
-            SummaryCard(title = "Current Streak", value = "0 Day Streak", modifier = Modifier.weight(1f).padding(start = 8.dp))
+            // Displaying the LIVE value from the ViewModel
+            SummaryCard(title = "Total Entries", value = uiState.totalEntries, modifier = Modifier.weight(1f).padding(end = 8.dp))
+            // Displaying the LIVE value from the ViewModel
+            SummaryCard(title = "Current Streak", value = uiState.currentStreak, modifier = Modifier.weight(1f).padding(start = 8.dp))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -98,7 +118,7 @@ fun HomeScreenUI(activity: ComponentActivity, modifier: Modifier) {
             style = MaterialTheme.typography.titleLarge
         )
 
-        // Navigation Buttons using Explicit Intents
+        // Navigation Buttons (these can stay exactly as they were)
         QuickActionButton(
             text = "Take Photo",
             subtext = "Capture today's progress",
@@ -150,7 +170,6 @@ fun SummaryCard(title: String, value: String, modifier: Modifier) {
     }
 }
 
-// Reusable component for the big menu buttons
 @Composable
 fun QuickActionButton(text: String, subtext: String, onClick: () -> Unit, icon: androidx.compose.ui.graphics.vector.ImageVector, accentColor: Color) {
     Card(
