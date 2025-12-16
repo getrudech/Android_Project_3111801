@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import com.example.dermadiaryapplication.ui.AppScaffold
+import com.example.dermadiaryapplication.OnboardingActivity
 import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
 import com.example.dermadiaryapplication.ui.viewmodel.AuthViewModel
 import com.example.dermadiaryapplication.ui.viewmodel.DermaDiaryViewModelFactory
@@ -44,13 +45,79 @@ class AuthorizationActivity : ComponentActivity() {
     }
 }
 
-// Placeholder UI for the Authorization Screen
 @Composable
 fun AuthorizationScreenUI(
     modifier: Modifier,
     viewModel: AuthViewModel
 ) {
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
+
+    // Local state for dialogs and inputs
+    var showSignInDialog by remember { mutableStateOf(false) }
+    var showSignUpDialog by remember { mutableStateOf(false) }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    // Navigation Effect: Triggers when ViewModel indicates a successful transition
+    LaunchedEffect(uiState.navigateToOnboarding, uiState.navigateToHome) {
+        if (uiState.navigateToOnboarding) {
+            context.startActivity(Intent(context, OnboardingActivity::class.java))
+            (context as ComponentActivity).finish()
+            viewModel.navigationHandled()
+        }
+        if (uiState.navigateToHome) {
+            context.startActivity(Intent(context, MainActivity::class.java))
+            (context as ComponentActivity).finish()
+            viewModel.navigationHandled()
+        }
+    }
+
+    // Error Dialog
+    if (uiState.error != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearError() },
+            title = { Text("Error") },
+            text = { Text(uiState.error!!) },
+            confirmButton = {
+                Button(onClick = { viewModel.clearError() }) { Text("OK") }
+            }
+        )
+    }
+
+    // Sign In Dialog
+    if (showSignInDialog) {
+        AuthDialog(
+            title = "Sign In",
+            onDismiss = { showSignInDialog = false },
+            onConfirm = { usr, pwd ->
+                viewModel.signIn(usr, pwd)
+                // Dialog hides itself upon successful navigation or is replaced by error dialog
+            },
+            username = username,
+            onUsernameChange = { username = it },
+            password = password,
+            onPasswordChange = { password = it },
+            isLoading = uiState.isLoading
+        )
+    }
+
+    // Sign Up Dialog
+    if (showSignUpDialog) {
+        AuthDialog(
+            title = "Sign Up",
+            onDismiss = { showSignUpDialog = false },
+            onConfirm = { usr, pwd ->
+                viewModel.register(usr, pwd) // Calls the register function
+                // Dialog hides itself upon successful navigation or is replaced by error dialog
+            },
+            username = username,
+            onUsernameChange = { username = it },
+            password = password,
+            onPasswordChange = { password = it },
+            isLoading = uiState.isLoading
+        )
+    }
 
     Column(
         modifier = modifier
@@ -65,31 +132,93 @@ fun AuthorizationScreenUI(
         )
         Spacer(Modifier.height(32.dp))
 
-        // Placeholder buttons for sign-in/sign-up
         Button(
-            onClick = { /* TODO: Implement sign-in logic */ },
-            modifier = Modifier.fillMaxWidth().height(56.dp)
+            onClick = {
+                username = ""
+                password = ""
+                showSignInDialog = true
+            },
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            enabled = !uiState.isLoading
         ) {
             Text("Sign In")
         }
         Spacer(Modifier.height(16.dp))
 
         OutlinedButton(
-            onClick = { /* TODO: Implement sign-up logic */ },
-            modifier = Modifier.fillMaxWidth().height(56.dp)
+            onClick = {
+                username = ""
+                password = ""
+                showSignUpDialog = true
+            },
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            enabled = !uiState.isLoading
         ) {
             Text("Create Account")
         }
 
-        // Temporary button to navigate to the main screen for testing
+        // Temporary button to navigate to the main screen for testing (unchanged)
         Spacer(Modifier.height(32.dp))
         TextButton(
             onClick = {
                 context.startActivity(Intent(context, MainActivity::class.java))
                 (context as ComponentActivity).finish()
-            }
+            },
+            enabled = !uiState.isLoading
         ) {
             Text("Continue as Guest (Skip Auth)")
         }
+
+        if (uiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+        }
     }
+}
+
+// Helper Composable for the Reusable Sign In/Sign Up Dialog
+@Composable
+fun AuthDialog(
+    title: String,
+    onDismiss: () -> Unit,
+    onConfirm: (username: String, password: String) -> Unit,
+    username: String,
+    onUsernameChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    isLoading: Boolean
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = onUsernameChange,
+                    label = { Text("Username") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = onPasswordChange,
+                    label = { Text("Password (Placeholder)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(username, password) },
+                enabled = username.isNotBlank() && password.isNotBlank() && !isLoading
+            ) {
+                Text(if (isLoading) "Processing..." else title)
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss, enabled = !isLoading) {
+                Text("Cancel")
+            }
+        }
+    )
 }

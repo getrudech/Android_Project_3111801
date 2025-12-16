@@ -16,24 +16,39 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext // <-- Crucial missing import for LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider // <-- Crucial missing import for ViewModelProvider
 import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
+import com.example.dermadiaryapplication.ui.viewmodel.DermaDiaryViewModelFactory // <-- Crucial import for your Factory
+import com.example.dermadiaryapplication.ui.viewmodel.OnboardingViewModel // <-- Crucial import for the ViewModel
 
 class OnboardingActivity : ComponentActivity() {
+
+    // 1. Must be declared at the class level for use in onCreate
+    private lateinit var viewModel: OnboardingViewModel
+    private lateinit var factory: DermaDiaryViewModelFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 2. The initialization block:
+        val app = application as DermaDiaryApp // Resolves the 'DermaDiaryApp' reference
+        factory = DermaDiaryViewModelFactory(app.journalRepository, app.profileRepository)
+        viewModel = ViewModelProvider(this, factory).get(OnboardingViewModel::class.java)
+
         setContent {
             DermaDiaryTheme {
-                OnboardingScreenUI()
+                // Pass the initialized ViewModel to the Composable
+                OnboardingScreenUI(viewModel)
             }
         }
     }
 
-    // Stores all the user's answers across the 3 steps
-    // Using mutableStateOf allows the UI to update when typing
+    // Stores all the user's answers across the 3 steps (UNTOUCHED from your original code)
     class OnboardingData(
         val skinConcerns: SnapshotStateList<Boolean>,
         val productRoutine: SnapshotStateList<ProductInput>
@@ -44,7 +59,7 @@ class OnboardingActivity : ComponentActivity() {
         var preexistingConditions by mutableStateOf("")
     }
 
-    // Helper class for the checklist items
+    // Helper class for the checklist items (UNTOUCHED from your original code)
     class ProductInput(
         val name: String
     ) {
@@ -53,12 +68,11 @@ class OnboardingActivity : ComponentActivity() {
     }
 
     @Composable
-    fun OnboardingScreenUI() {
+    fun OnboardingScreenUI(viewModel: OnboardingViewModel) {
         val totalSteps = 3
         var currentStep by remember { mutableStateOf(0) }
         val productTypes = listOf("Cleanser", "Moisturizer", "Serum", "SPF")
 
-        // Initialize our data holder
         val onboardingData = remember {
             OnboardingData(
                 skinConcerns = mutableStateListOf(false, false, false, false, false),
@@ -67,6 +81,35 @@ class OnboardingActivity : ComponentActivity() {
                 }
             )
         }
+
+        // Collect state from ViewModel
+        val uiState by viewModel.uiState.collectAsState()
+        val context = LocalContext.current as ComponentActivity
+
+
+        // Navigation Effect: Triggers when ViewModel indicates a successful save
+        LaunchedEffect(uiState.saveSuccess) {
+            if (uiState.saveSuccess) {
+                // Navigate to the main dashboard
+                val intent = Intent(context, MainActivity::class.java)
+                context.startActivity(intent)
+                context.finish()
+                viewModel.saveHandled() // Clear the flag
+            }
+        }
+
+        // Error Dialog
+        if (uiState.error != null) {
+            AlertDialog(
+                onDismissRequest = { viewModel.clearError() },
+                title = { Text("Error") },
+                text = { Text(uiState.error!!) },
+                confirmButton = {
+                    Button(onClick = { viewModel.clearError() }) { Text("OK") }
+                }
+            )
+        }
+
 
         Column(
             modifier = Modifier
@@ -101,7 +144,7 @@ class OnboardingActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (currentStep > 0) {
-                    OutlinedButton(onClick = { currentStep-- }) {
+                    OutlinedButton(onClick = { currentStep-- }, enabled = !uiState.isSaving) {
                         Text("Back", color = MaterialTheme.colorScheme.primary)
                     }
                 } else {
@@ -113,19 +156,28 @@ class OnboardingActivity : ComponentActivity() {
                         if (currentStep < totalSteps - 1) {
                             currentStep++ // Go to next step
                         } else {
-                            // Finished! Go to main app
-                            val intent = Intent(this@OnboardingActivity, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
+                            // Finished! Call ViewModel to save data
+                            viewModel.saveOnboardingData(onboardingData)
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    enabled = !uiState.isSaving // Disable button while saving
                 ) {
-                    Text(if (currentStep == totalSteps - 1) "Finish" else "Next", color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        when {
+                            uiState.isSaving -> "Saving..."
+                            currentStep == totalSteps - 1 -> "Finish"
+                            else -> "Next"
+                        },
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
         }
     }
+
+    // NOTE: Keep your existing implementations of SkinConcernsStep, RoutineStep,
+    // RoutineProductInput, and LifestyleStep here.
 
     @Composable
     fun SkinConcernsStep(checkedStates: SnapshotStateList<Boolean>) {

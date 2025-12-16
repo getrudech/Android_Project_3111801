@@ -41,13 +41,26 @@ class MainActivity : ComponentActivity() {
         // Check Onboarding status and launch the correct activity
         lifecycleScope.launch {
             val profile = app.profileRepository.loadProfile()
+
+            // --- START FIX FOR NULLABLE RECEIVER ---
+
+            // Case 1: No profile exists (first run, or unregistered). Go to Auth.
+            if (profile == null) {
+                startActivity(Intent(this@MainActivity, AuthorizationActivity::class.java))
+                finish()
+                return@launch
+            }
+
+            // Case 2: Profile exists, but Onboarding is NOT complete. Go to Onboarding.
             if (!profile.hasCompletedOnboarding) {
                 startActivity(Intent(this@MainActivity, OnboardingActivity::class.java))
                 finish() // Close this activity
                 return@launch
             }
+            // --- END FIX ---
 
-            // If onboarding is complete, set the content for MainActivity
+
+            // If onboarding is complete (Case 3), set the content for MainActivity
             setContent {
                 DermaDiaryTheme {
                     AppScaffold(title = "Dashboard", showBackArrow = false) { paddingModifier ->
@@ -62,10 +75,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
-
-// Placeholder UI for the main dashboard screen
+// Placeholder UI for the main dashboard screen (UNCHANGED)
 @Composable
 fun HomeScreenUI(modifier: Modifier, viewModel: HomeViewModel) {
     val context = LocalContext.current
