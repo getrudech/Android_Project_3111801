@@ -67,7 +67,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation(libs.androidx.room.compiler)
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
