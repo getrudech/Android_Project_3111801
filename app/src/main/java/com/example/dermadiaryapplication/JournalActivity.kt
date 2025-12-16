@@ -3,7 +3,6 @@ package com.example.dermadiaryapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,8 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
-import com.example.dermadiaryapplication.data.db.DermaDiaryDatabase
-import com.example.dermadiaryapplication.data.repository.JournalRepository
 import com.example.dermadiaryapplication.ui.viewmodel.JournalViewModel
 import com.example.dermadiaryapplication.ui.viewmodel.DermaDiaryViewModelFactory
 
@@ -31,10 +28,15 @@ class JournalActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DermaDiaryTheme {
-                // Setting up the database and repository
-                val database = remember { DermaDiaryDatabase.getDatabase(applicationContext) }
-                val repository = remember { JournalRepository(database.journalDao()) }
-                val factory = remember { DermaDiaryViewModelFactory(repository) }
+
+                // --- NEW REPOSITORY INITIALIZATION ---
+                // 1. Get the global application instance
+                val app = application as DermaDiaryApp
+
+                // 2. Get the repository from the Application class
+                val factory = remember {
+                    DermaDiaryViewModelFactory(app.journalRepository, app.profileRepository)
+                }
 
                 AppScaffold(title = "Daily Reflection", showBackArrow = true) { paddingModifier ->
                     // Injecting the ViewModel here so the UI can use it

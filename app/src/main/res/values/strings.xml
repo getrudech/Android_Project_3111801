@@ -10,4 +10,5 @@
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_authorization">AuthorizationActivity</string>
     <string name="title_activity_onboarding">OnboardingActivity</string>
+    <string name="title_activity_profile">ProfileActivity</string>
 </resources>
