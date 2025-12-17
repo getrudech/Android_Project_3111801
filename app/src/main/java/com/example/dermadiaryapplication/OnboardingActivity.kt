@@ -174,7 +174,6 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-  .
 
     @Composable
     fun SkinConcernsStep(checkedStates: SnapshotStateList<Boolean>) {
