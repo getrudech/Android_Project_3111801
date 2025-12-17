@@ -28,7 +28,6 @@ class JournalViewModel(private val repository: JournalRepository) : ViewModel() 
     private val _uiState = MutableStateFlow(JournalUiState())
     val uiState: StateFlow<JournalUiState> = _uiState
 
-    // ... (All update functions remain the same)
     fun updateMood(index: Int) {
         _uiState.update { it.copy(selectedMoodIndex = index) }
     }
@@ -80,7 +79,6 @@ class JournalViewModel(private val repository: JournalRepository) : ViewModel() 
                 repository.saveEntry(newEntry)
                 _uiState.update { it.copy(isSaving = false, saveSuccess = true) } // Success!
             } catch (e: Exception) {
-                // You would typically log the error here
                 _uiState.update { it.copy(isSaving = false, saveSuccess = false) }
             }
         }

@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // --- REPOSITORY/FACTORY INITIALIZATION ---
         val app = application as DermaDiaryApp
         factory = DermaDiaryViewModelFactory(app.journalRepository, app.profileRepository)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
@@ -74,7 +73,6 @@ fun HomeScreenUI(modifier: Modifier, viewModel: HomeViewModel) {
     val profile = uiState.userProfile
     val scrollState = rememberScrollState()
 
-    // --- Aesthetic Fix: Wrapper Card for Light Pink Border ---
     Surface(
         modifier = modifier
             .fillMaxSize()
@@ -87,7 +85,7 @@ fun HomeScreenUI(modifier: Modifier, viewModel: HomeViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // FIX: Inner background color set to standard background/surface
+                //Inner background color set to standard background/surface
                 .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 24.dp),
@@ -95,7 +93,6 @@ fun HomeScreenUI(modifier: Modifier, viewModel: HomeViewModel) {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
-            // --- Welcome Card (Friendly Greeting + Icon) ---
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -196,7 +193,7 @@ fun HomeScreenUI(modifier: Modifier, viewModel: HomeViewModel) {
     }
 }
 
-// SummaryCard (UNCHANGED)
+// SummaryCard
 @Composable
 fun SummaryCard(title: String, value: String, modifier: Modifier) {
     Card(
@@ -215,7 +212,7 @@ fun SummaryCard(title: String, value: String, modifier: Modifier) {
     }
 }
 
-// QuickActionButton (UNCHANGED)
+// QuickActionButton
 @Composable
 fun QuickActionButton(text: String, subtext: String, onClick: () -> Unit, icon: ImageVector, accentColor: Color) {
     Card(

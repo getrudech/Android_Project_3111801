@@ -42,10 +42,8 @@ android {
     }
     configurations.all {
         resolutionStrategy {
-            // Force use of the newer annotations version
             force("org.jetbrains:annotations:23.0.0")
 
-            // Exclude the problematic module from all dependencies
             exclude(group = "com.intellij", module = "annotations")
         }
     }

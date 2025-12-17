@@ -25,14 +25,13 @@ class SplashActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DermaDiaryTheme {
-                // FIX 1: Pass the Activity instance here
                 SplashScreenUI(this)
             }
         }
     }
 
     @Composable
-    fun SplashScreenUI(activity: ComponentActivity) { // FIX 2: Accept the Activity instance
+    fun SplashScreenUI(activity: ComponentActivity) {
 
         // LaunchedEffect triggers a coroutine immediately when the composable enters the screen
         LaunchedEffect(key1 = true) {
@@ -41,7 +40,6 @@ class SplashActivity : ComponentActivity() {
                 delay(3000)
 
                 // Navigate to the next screen (AuthActivity)
-                // FIX 3: Use the passed 'activity' instance for navigation
                 val intent = Intent(activity, AuthorizationActivity::class.java)
                 activity.startActivity(intent)
                 activity.finish()
@@ -57,7 +55,7 @@ class SplashActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                // FIX 4: Correct brand name and size
+                //  Correct brand name and size
                 text = "Derma Diary",
                 fontSize = 48.sp,
                 color = MaterialTheme.colorScheme.primary,

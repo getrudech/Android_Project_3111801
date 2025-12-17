@@ -28,7 +28,6 @@ import com.example.dermadiaryapplication.ui.viewmodel.OnboardingViewModel // <--
 
 class OnboardingActivity : ComponentActivity() {
 
-    // 1. Must be declared at the class level for use in onCreate
     private lateinit var viewModel: OnboardingViewModel
     private lateinit var factory: DermaDiaryViewModelFactory
 
@@ -48,7 +47,6 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    // Stores all the user's answers across the 3 steps (UNTOUCHED from your original code)
     class OnboardingData(
         val skinConcerns: SnapshotStateList<Boolean>,
         val productRoutine: SnapshotStateList<ProductInput>
@@ -176,8 +174,7 @@ class OnboardingActivity : ComponentActivity() {
         }
     }
 
-    // NOTE: Keep your existing implementations of SkinConcernsStep, RoutineStep,
-    // RoutineProductInput, and LifestyleStep here.
+  .
 
     @Composable
     fun SkinConcernsStep(checkedStates: SnapshotStateList<Boolean>) {

@@ -171,7 +171,6 @@ fun JournalScreenUI(modifier: Modifier, viewModel: JournalViewModel) {
 }
 
 
-// --- HELPER COMPOSABLES (FIXING UNRESOLVED REFERENCES) ---
 
 // Helper composable for radio buttons
 @Composable

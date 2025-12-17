@@ -27,11 +27,11 @@ class HomeViewModel(
 ) : ViewModel() {
 
     // 1. Internal state flow for the user profile, loaded once on startup
-    private val _userProfile = MutableStateFlow<UserProfile?>(null) // <-- NEW
+    private val _userProfile = MutableStateFlow<UserProfile?>(null)
 
     init {
         // Load the profile when the ViewModel is created
-        loadUserProfile() // <-- NEW
+        loadUserProfile()
     }
 
     // Function to load the user profile asynchronously

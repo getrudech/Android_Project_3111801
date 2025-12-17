@@ -27,7 +27,7 @@ class AuthorizationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize the factory and ViewModel (must be done before setContent)
+        // Initialize the factory and ViewModel
         val app = application as DermaDiaryApp
         factory = DermaDiaryViewModelFactory(app.journalRepository, app.profileRepository)
         viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
@@ -202,7 +202,7 @@ fun AuthDialog(
                 OutlinedTextField(
                     value = password,
                     onValueChange = onPasswordChange,
-                    label = { Text("Password (Placeholder)") },
+                    label = { Text("Password") },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

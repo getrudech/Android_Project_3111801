@@ -14,7 +14,7 @@ data class ProfileUiState(
     val profile: UserProfile = UserProfile(),
     val isLoading: Boolean = true,
     val error: String? = null,
-    val isSignedOut: Boolean = false // <-- NEW: Flag for sign-out navigation
+    val isSignedOut: Boolean = false
 )
 
 class ProfileViewModel(
@@ -29,7 +29,6 @@ class ProfileViewModel(
     }
 
     private fun loadUserProfile() {
-        // ... (existing loadUserProfile logic remains the same)
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
         viewModelScope.launch {

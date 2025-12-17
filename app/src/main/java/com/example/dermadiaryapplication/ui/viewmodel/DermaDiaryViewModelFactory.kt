@@ -28,11 +28,9 @@ class DermaDiaryViewModelFactory(
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> {
                 ProfileViewModel(profileRepository) as T
             }
-            // --- NEW: Register CameraViewModel ---
             modelClass.isAssignableFrom(CameraViewModel::class.java) -> {
                 CameraViewModel(journalRepository) as T
             }
-            // -------------------------------------
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

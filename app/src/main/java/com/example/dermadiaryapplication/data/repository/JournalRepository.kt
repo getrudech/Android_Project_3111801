@@ -35,13 +35,11 @@ class JournalRepository(context: Context) {
             .sortedByDescending { it.entryDate }
     }
 
-    // Coroutine Flow to observe all entries (FIXED REACTIVE IMPLEMENTATION)
     val allEntries: Flow<List<JournalEntry>> = dataChangedFlow
         .onStart { emit(Unit) } // Emit Unit once on start to trigger initial load
         .map { fetchAllEntriesFromPrefs() } // Map the trigger event to the actual data fetch
 
 
-    // Getting the total count (FIXED REACTIVE IMPLEMENTATION)
     val entryCount: Flow<Int> = dataChangedFlow
         .onStart { emit(Unit) } // Emit Unit once on start to trigger initial load
         .map { prefs.all.size } // Map the trigger event to the total size
@@ -55,7 +53,6 @@ class JournalRepository(context: Context) {
             .putString(entry.entryDate.toString(), json)
             .apply()
 
-        // KEY FIX: Signal that data has changed
         dataChangedFlow.emit(Unit)
     }
 

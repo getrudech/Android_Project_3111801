@@ -70,7 +70,7 @@ class AuthViewModel(
                     return@launch
                 }
 
-                // 2. Check if the user is fully onboarded (your specific requirement)
+                // 2. Check if the user is fully onboarded
                 if (existingProfile.hasCompletedOnboarding) {
                     // Success: Go directly to the main dashboard
                     _uiState.value = _uiState.value.copy(

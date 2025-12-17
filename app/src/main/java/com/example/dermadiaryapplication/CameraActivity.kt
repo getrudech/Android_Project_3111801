@@ -29,12 +29,12 @@ import com.example.dermadiaryapplication.ui.viewmodel.CameraViewModel // <-- NEW
 import com.example.dermadiaryapplication.ui.viewmodel.DermaDiaryViewModelFactory // <-- NEW IMPORT
 import com.example.dermadiaryapplication.ui.AppScaffold // Assuming AppScaffold exists
 
-// Global variables for sensor handling (UNCHANGED)
+// Global variables for sensor handling
 private var lightValue = mutableStateOf(0.0f)
 private lateinit var sensorManager: SensorManager
 private var lightSensor: Sensor? = null
 
-// The listener that detects changes in light (UNCHANGED)
+// The listener that detects changes in light
 private val lightListener: SensorEventListener = object : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
@@ -53,12 +53,10 @@ class CameraActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // --- ViewModel Initialization ---
-        val app = application as DermaDiaryApp // Assuming DermaDiaryApp exists
+        val app = application as DermaDiaryApp
         factory = DermaDiaryViewModelFactory(app.journalRepository, app.profileRepository)
         viewModel = ViewModelProvider(this, factory).get(CameraViewModel::class.java)
-        // ------------------------------------
 
-        // Initialize sensor service (UNCHANGED)
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
 
@@ -71,7 +69,7 @@ class CameraActivity : ComponentActivity() {
         }
     }
 
-    // Start listening when the app is active (UNCHANGED)
+    // Start listening when the app is active
     override fun onResume() {
         super.onResume()
         lightSensor?.let {
@@ -83,7 +81,7 @@ class CameraActivity : ComponentActivity() {
         }
     }
 
-    // Stop listening to save battery when app is in background (UNCHANGED)
+    // Stop listening to save battery when app is in background
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(lightListener)
@@ -100,7 +98,7 @@ class CameraActivity : ComponentActivity() {
         ) { uri: Uri? ->
             imageUri = uri
             if (uri != null) {
-                viewModel.logPhotoCompletion() // <-- CALL TO LOG PHOTO ENTRY
+                viewModel.logPhotoCompletion()
             }
         }
 
@@ -112,7 +110,7 @@ class CameraActivity : ComponentActivity() {
             }
         }
 
-        // Logic to determine if lighting is good or bad (UNCHANGED)
+        // Logic to determine if lighting is good or bad
         val currentLux = lightValue.value
         val lightingFeedback = when {
             currentLux < 50f -> "Too Dark (Warning)"
@@ -120,7 +118,7 @@ class CameraActivity : ComponentActivity() {
             else -> "Good"
         }
 
-        // Change text color based on the warning (UNCHANGED)
+        // Change text color based on the warning
         val sensorColor = when (lightingFeedback) {
             "Good" -> MaterialTheme.colorScheme.tertiary
             else -> MaterialTheme.colorScheme.error
@@ -135,7 +133,7 @@ class CameraActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Card showing tips and sensor feedback (UNCHANGED)
+            // Card showing tips and sensor feedback
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -170,7 +168,7 @@ class CameraActivity : ComponentActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Button to trigger the implicit intent (UNCHANGED)
+                    // Button to trigger the implicit intent
                     Button(
                         onClick = { launcher.launch("image/*") },
                         modifier = Modifier.size(80.dp),
