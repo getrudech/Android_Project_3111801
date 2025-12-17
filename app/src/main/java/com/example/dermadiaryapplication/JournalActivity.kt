@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dermadiaryapplication.ui.theme.DermaDiaryTheme
 import com.example.dermadiaryapplication.ui.viewmodel.JournalViewModel
 import com.example.dermadiaryapplication.ui.viewmodel.DermaDiaryViewModelFactory
+import com.example.dermadiaryapplication.ui.AppScaffold // Assuming this is defined in AppComposables.kt
 
 class JournalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,20 +30,16 @@ class JournalActivity : ComponentActivity() {
         setContent {
             DermaDiaryTheme {
 
-                // --- NEW REPOSITORY INITIALIZATION ---
-                // 1. Get the global application instance
                 val app = application as DermaDiaryApp
 
-                // 2. Get the repository from the Application class
                 val factory = remember {
                     DermaDiaryViewModelFactory(app.journalRepository, app.profileRepository)
                 }
 
                 AppScaffold(title = "Daily Reflection", showBackArrow = true) { paddingModifier ->
-                    // Injecting the ViewModel here so the UI can use it
                     JournalScreenUI(
                         modifier = paddingModifier,
-                        viewModel = viewModel(factory = factory) // Tell Compose to use my custom factory
+                        viewModel = viewModel(factory = factory)
                     )
                 }
             }
@@ -50,57 +47,26 @@ class JournalActivity : ComponentActivity() {
     }
 }
 
-// Custom Scaffold wrapper to keep consistent headers
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AppScaffold(
-    title: String,
-    showBackArrow: Boolean = false,
-    content: @Composable (Modifier) -> Unit
-) {
-    val context = LocalContext.current
-    val scaffoldBackground = MaterialTheme.colorScheme.background
-
-    Scaffold(
-        containerColor = scaffoldBackground,
-        topBar = {
-            TopAppBar(
-                title = { Text(text = title, color = MaterialTheme.colorScheme.onBackground) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Transparent,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
-                ),
-                navigationIcon = {
-                    if (showBackArrow) {
-                        IconButton(onClick = {
-                            (context as ComponentActivity).finish() // Close activity on back press
-                        }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
-                        }
-                    }
-                }
-            )
-        },
-        content = { paddingValues ->
-            content(Modifier.padding(paddingValues))
-        }
-    )
-}
-
 @Composable
 fun JournalScreenUI(modifier: Modifier, viewModel: JournalViewModel) {
-    // This watches the ViewModel for any state changes, so the UI updates automatically
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current as ComponentActivity
+    val moodOptions = listOf("Happy", "Neutral", "Stressed") // Defined options here
 
-    val moodOptions = listOf("Happy", "Neutral", "Stressed")
+    // Effect to handle successful saving
+    LaunchedEffect(uiState.saveSuccess) {
+        if (uiState.saveSuccess) {
+            // Navigate back to the main dashboard
+            context.finish()
+            viewModel.saveHandled() // Clear the flag
+        }
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()), // Allows scrolling so keyboard doesn't hide fields
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -110,7 +76,6 @@ fun JournalScreenUI(modifier: Modifier, viewModel: JournalViewModel) {
         Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = "How are you feeling?", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
-                // Hooking up the RadioButtonGroup to the ViewModel function
                 RadioButtonGroup(moodOptions, uiState.selectedMoodIndex) {
                     viewModel.updateMood(it)
                 }
@@ -188,17 +153,25 @@ fun JournalScreenUI(modifier: Modifier, viewModel: JournalViewModel) {
             }
         }
 
+        // FINAL BUTTON: Check isSaving state
         Button(
-            // Tying the button directly to the ViewModel's save function
             onClick = { viewModel.saveDailyLog() },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            enabled = !uiState.isSaving // Disable button while saving
         ) {
-            Text(text = "Save Daily Log", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary)
+            Text(
+                text = if (uiState.isSaving) "Saving..." else "Save Daily Log",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
+
+
+// --- HELPER COMPOSABLES (FIXING UNRESOLVED REFERENCES) ---
 
 // Helper composable for radio buttons
 @Composable

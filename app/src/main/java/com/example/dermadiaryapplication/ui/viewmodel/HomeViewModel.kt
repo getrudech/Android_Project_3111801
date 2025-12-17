@@ -6,6 +6,7 @@ import com.example.dermadiaryapplication.data.db.entity.JournalEntry
 import com.example.dermadiaryapplication.data.db.entity.UserProfile
 import com.example.dermadiaryapplication.data.repository.JournalRepository
 import com.example.dermadiaryapplication.data.repository.ProfileRepository
+import kotlinx.coroutines.flow.MutableStateFlow // <-- NEW IMPORT
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -25,15 +26,32 @@ class HomeViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    // The combined state stream for the UI
+    // 1. Internal state flow for the user profile, loaded once on startup
+    private val _userProfile = MutableStateFlow<UserProfile?>(null) // <-- NEW
+
+    init {
+        // Load the profile when the ViewModel is created
+        loadUserProfile() // <-- NEW
+    }
+
+    // Function to load the user profile asynchronously
+    private fun loadUserProfile() {
+        viewModelScope.launch {
+            // This now correctly suspends until the profile is loaded or determined to be null
+            _userProfile.value = profileRepository.loadProfile()
+        }
+    }
+
+    // 2. The combined state stream for the UI, now including the profile flow
     val uiState: StateFlow<HomeUiState> = combine(
         journalRepository.allEntries,
-        journalRepository.entryCount
-    ) { allEntries, entryCount ->
+        journalRepository.entryCount,
+        _userProfile // <-- Now combining with the profile flow
+    ) { allEntries, entryCount, userProfile -> // <-- Updated lambda parameters
         HomeUiState(
             entryCount = entryCount,
             allEntries = allEntries,
-            userProfile = fetchUserProfile(),
+            userProfile = userProfile, // <-- This will be the correctly fetched profile
             isLoading = false
         )
     }.stateIn(
@@ -42,14 +60,5 @@ class HomeViewModel(
         initialValue = HomeUiState()
     )
 
-    // Function to fetch the user profile (called during initialization)
-    private fun fetchUserProfile(): UserProfile? {
-        var profile: UserProfile? = null
-        viewModelScope.launch {
-            profile = profileRepository.loadProfile()
-        }
-        return profile
-    }
-
-    // You can add more dashboard-specific logic here, e.g., refreshing data
+    // The old fetchUserProfile function is removed as it was incorrect.
 }

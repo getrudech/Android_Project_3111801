@@ -6,22 +6,25 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map // <-- NEW IMPORT
+import kotlinx.coroutines.flow.onStart // <-- CORRECT IMPORT
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 // The interface between the storage layer and the ViewModel.
-//View Model can only talk to the Repository, not the actual database.
 class JournalRepository(context: Context) {
-    // We use SharedPreferences to store the data
     private val prefs = context.getSharedPreferences("daily_logs_prefs", Context.MODE_PRIVATE)
     private val gson = Gson()
-    private val entryType = object : TypeToken<JournalEntry>() {}.type // Gson type reference
+    private val entryType = object : TypeToken<JournalEntry>() {}.type
+
+    // Trigger to signal that the underlying data in SharedPreferences has changed
+    private val dataChangedFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     // Utility function to get all entries, converting JSON back to objects
     private fun fetchAllEntriesFromPrefs(): List<JournalEntry> {
         return prefs.all.values
-            .mapNotNull { it as? String } // Get all stored JSON strings
+            .mapNotNull { it as? String }
             .mapNotNull {
                 try {
                     gson.fromJson<JournalEntry>(it, entryType)
@@ -32,46 +35,56 @@ class JournalRepository(context: Context) {
             .sortedByDescending { it.entryDate }
     }
 
-    // Coroutine Flow to observe all entries (simulates Room's Flow)
-    val allEntries: Flow<List<JournalEntry>> = flow {
-        // Since SharedPreferences has no built-in Flow, we emit the list when requested
-        emit(fetchAllEntriesFromPrefs())
-    }
+    // Coroutine Flow to observe all entries (FIXED REACTIVE IMPLEMENTATION)
+    val allEntries: Flow<List<JournalEntry>> = dataChangedFlow
+        .onStart { emit(Unit) } // Emit Unit once on start to trigger initial load
+        .map { fetchAllEntriesFromPrefs() } // Map the trigger event to the actual data fetch
 
-    // Getting the total count
-    val entryCount: Flow<Int> = flow {
-        emit(prefs.all.size)
-    }
+
+    // Getting the total count (FIXED REACTIVE IMPLEMENTATION)
+    val entryCount: Flow<Int> = dataChangedFlow
+        .onStart { emit(Unit) } // Emit Unit once on start to trigger initial load
+        .map { prefs.all.size } // Map the trigger event to the total size
 
 
     // Saves a new daily log.
     suspend fun saveEntry(entry: JournalEntry) = withContext(Dispatchers.IO) {
-        // Convert Kotlin object to JSON string
         val json = gson.toJson(entry)
 
-        // Use the date as the unique key
         prefs.edit()
             .putString(entry.entryDate.toString(), json)
             .apply()
+
+        // KEY FIX: Signal that data has changed
+        dataChangedFlow.emit(Unit)
     }
 
     // check to see if they already logged data for a specific day.
     suspend fun getEntryForDate(date: LocalDate): JournalEntry? = withContext(Dispatchers.IO) {
-        // Retrieve the JSON string using the date as the key
         val json = prefs.getString(date.toString(), null)
-
-        // Convert JSON string back to JournalEntry object
         return@withContext if (json != null) gson.fromJson<JournalEntry>(json, entryType) else null
     }
 
-    // Deletes an entry by date (since date is the key)
-    suspend fun deleteEntry(id: Long) {
-        // NOTE: Since the key is the date, we would need to look up the date by ID first.
-        // For simplicity, we assume the ViewModel handles finding the entry by ID
-        // and calling a delete by date, or you'd pass the date here.
-        // For now, we will leave this as a placeholder or remove it if not needed in the UI.
-        // We will update the function signature to match the previous Room one (deleteEntry(id: Long))
-        // Since SharedPreferences doesn't have an ID index, this Room function can't be directly implemented.
-        // We will remove it since it relies on the database's primary key index.
+    /**
+     * Logs the completion of a photo upload for the current date.
+     */
+    suspend fun logPhotoEntry(date: LocalDate) = withContext(Dispatchers.IO) {
+        val existingEntry = getEntryForDate(date)
+
+        val minimalEntry = JournalEntry(
+            id = 0L, entryDate = date, mood = "", stressLevel = 0, sleepHours = 0.0,
+            waterIntake = 0.0, generalNotes = "", photoUri = null, productsUsed = emptyList(), hasPhoto = true
+        )
+
+        if (existingEntry != null) {
+            // Entry already exists, update the photo status
+            val updatedEntry = existingEntry.copy(hasPhoto = true)
+            // saveEntry handles the SharedPreferences update AND the dataChangedFlow.emit(Unit)
+            saveEntry(updatedEntry)
+        } else {
+            // No entry exists for today, create the minimal entry
+            saveEntry(minimalEntry)
+        }
+        // No need to emit Unit here as saveEntry already does it.
     }
 }

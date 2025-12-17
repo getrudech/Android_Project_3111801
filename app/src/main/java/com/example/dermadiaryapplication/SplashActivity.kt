@@ -11,10 +11,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,25 +25,26 @@ class SplashActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DermaDiaryTheme {
-                SplashScreenUI()
+                // FIX 1: Pass the Activity instance here
+                SplashScreenUI(this)
             }
         }
     }
 
     @Composable
-    fun SplashScreenUI() {
-        val coroutineScope = rememberCoroutineScope() // Coroutine scope for running tasks
+    fun SplashScreenUI(activity: ComponentActivity) { // FIX 2: Accept the Activity instance
 
         // LaunchedEffect triggers a coroutine immediately when the composable enters the screen
         LaunchedEffect(key1 = true) {
-            coroutineScope.launch {
+            launch {
                 // Delay for 3 seconds
                 delay(3000)
 
                 // Navigate to the next screen (AuthActivity)
-                val intent = Intent(this@SplashActivity, AuthorizationActivity::class.java)
-                startActivity(intent)
-                finish()
+                // FIX 3: Use the passed 'activity' instance for navigation
+                val intent = Intent(activity, AuthorizationActivity::class.java)
+                activity.startActivity(intent)
+                activity.finish()
             }
         }
 
@@ -58,8 +57,9 @@ class SplashActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "DermaDiary",
-                fontSize = 50.sp,
+                // FIX 4: Correct brand name and size
+                text = "Derma Diary",
+                fontSize = 48.sp,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(bottom = 24.dp)
@@ -67,7 +67,7 @@ class SplashActivity : ComponentActivity() {
 
             Text(
                 text = "Loading Your Skin Health Journal...",
-                style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 

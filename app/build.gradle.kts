@@ -70,6 +70,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation(libs.androidx.foundation)
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     testImplementation(libs.junit)

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-//holds all the variables for the Journal screen
+// holds all the variables for the Journal screen
 data class JournalUiState(
     val selectedMoodIndex: Int = 0,
     val stressLevel: Float = 5f,
@@ -18,41 +18,32 @@ data class JournalUiState(
     val waterGlasses: String = "8",
     val dietNotes: String = "",
     val skincareProducts: List<String> = listOf("Facial Cleanser", "Daily Moisturizer", "Vitamin C Serum", "Acne Spot Treatment"),
-    val productsUsedState: List<Boolean> = List(4) { false }
+    val productsUsedState: List<Boolean> = List(4) { false },
+    val isSaving: Boolean = false, // NEW
+    val saveSuccess: Boolean = false // NEW
 )
 
-// handles all the logic  for the Journal screen.
+// handles all the logic for the Journal screen.
 class JournalViewModel(private val repository: JournalRepository) : ViewModel() {
-    // A live stream of the current state of the entire form
     private val _uiState = MutableStateFlow(JournalUiState())
     val uiState: StateFlow<JournalUiState> = _uiState
 
-    //change the selected mood radio button
+    // ... (All update functions remain the same)
     fun updateMood(index: Int) {
         _uiState.update { it.copy(selectedMoodIndex = index) }
     }
-
-    // Updates the stress slider
     fun updateStressLevel(level: Float) {
         _uiState.update { it.copy(stressLevel = level) }
     }
-
-    // Handles text input for sleep
     fun updateSleepHours(hours: String) {
         _uiState.update { it.copy(sleepHours = hours) }
     }
-
-    // Handles text input for water
     fun updateWaterGlasses(glasses: String) {
         _uiState.update { it.copy(waterGlasses = glasses) }
     }
-
-    // Handles text input for diet notes
     fun updateDietNotes(notes: String) {
         _uiState.update { it.copy(dietNotes = notes) }
     }
-
-    // Handles the checklist for skincare products
     fun updateProductUsed(index: Int, isChecked: Boolean) {
         _uiState.update { currentState ->
             val newProductStates = currentState.productsUsedState.toMutableList()
@@ -60,29 +51,42 @@ class JournalViewModel(private val repository: JournalRepository) : ViewModel() 
             currentState.copy(productsUsedState = newProductStates)
         }
     }
+    // End of existing update functions
 
     // takes the form data and save it.
     fun saveDailyLog() {
+        _uiState.update { it.copy(isSaving = true, saveSuccess = false) } // Set saving state
         viewModelScope.launch {
             val state = _uiState.value
             val moodOptions = listOf("Happy", "Neutral", "Stressed")
 
-            // Filter down to the products they actually used
             val usedProducts = state.skincareProducts
                 .filterIndexed { index, _ -> state.productsUsedState[index] }
 
-            // Create the entry object using the current day's date
             val newEntry = JournalEntry(
+                id = 0L,
                 entryDate = LocalDate.now(),
                 mood = moodOptions[state.selectedMoodIndex],
                 stressLevel = state.stressLevel.toInt(),
                 sleepHours = state.sleepHours.toDoubleOrNull() ?: 0.0,
                 waterIntake = state.waterGlasses.toDoubleOrNull() ?: 0.0,
                 generalNotes = state.dietNotes,
-                productsUsed = usedProducts
+                photoUri = null,
+                productsUsed = usedProducts,
+                hasPhoto = false
             )
 
-            repository.saveEntry(newEntry)
+            try {
+                repository.saveEntry(newEntry)
+                _uiState.update { it.copy(isSaving = false, saveSuccess = true) } // Success!
+            } catch (e: Exception) {
+                // You would typically log the error here
+                _uiState.update { it.copy(isSaving = false, saveSuccess = false) }
+            }
         }
+    }
+
+    fun saveHandled() {
+        _uiState.update { it.copy(saveSuccess = false) }
     }
 }
