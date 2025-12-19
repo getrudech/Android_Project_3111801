@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
  * Repository to manage the single UserProfile object stored locally
  * using SharedPreferences and Gson.
  */
-class ProfileRepository(context: Context) {
+class ProfileRepository(private val context: Context) {
 
     // We use a separate SharedPreferences file for the user profile
     private val prefs = context.getSharedPreferences("user_profile_prefs", Context.MODE_PRIVATE)
@@ -51,12 +51,16 @@ class ProfileRepository(context: Context) {
         }
     }
 
+
     /**
      * Clears the UserProfile data from SharedPreferences. Used for signing out.
      */
-    suspend fun clearProfile() = withContext(Dispatchers.IO) {
-        prefs.edit()
-            .remove(profileKey) // Removes the stored profile JSON
-            .apply()
+    fun clearProfile() {
+        val profilePrefs = context.getSharedPreferences("user_profile_prefs", Context.MODE_PRIVATE)
+        profilePrefs.edit().clear().apply()
+
+        // 3. Wiping the journal logs so the next user starts at 0
+        val journalPrefs = context.getSharedPreferences("daily_logs_prefs", Context.MODE_PRIVATE)
+        journalPrefs.edit().clear().apply()
     }
 }
